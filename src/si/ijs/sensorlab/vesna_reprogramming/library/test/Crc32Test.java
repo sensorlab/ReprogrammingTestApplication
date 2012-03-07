@@ -21,6 +21,19 @@ public class Crc32Test {
 
 		CRC32 crc = new CRC32();
 
+		int i,j,n;
+
+		for(i=1; i<15; i++){
+			crc.reset();
+			for(j=1; j<i; j++){
+				n = 16*j+j; /* 0x11, 0x22, ... */
+				// System.out.println(Integer.toHexString(n));
+				crc.update(n);
+			}
+			System.out.println("CRC on 0x11 -> 0x" + Integer.toHexString(i-1) +
+					" = " + Long.toHexString(crc.getValue()));
+		}
+
 		crc.reset();		
 		System.out.println("CRC on nothing: " + Long.toHexString(crc.getValue()));
 
