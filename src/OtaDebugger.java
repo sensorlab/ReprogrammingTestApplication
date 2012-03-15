@@ -403,9 +403,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
         textbar.selectAll();                //highlight text so it can be easily overwritten
         //if serial port open, write to serial port
         if (open == true) {
-            if (!text.equals("+++") && displayFormat == RxFormat.ASCII) {
-                text = text + "\r"; //append carriage return to text (except for +++ for XBee)
-            }
+            text = text + "\r\n"; //append carriage return to text            
             try {
                 outputStream.write(text.getBytes()); //write to serial port
             } catch (IOException ex) {

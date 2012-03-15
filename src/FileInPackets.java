@@ -118,8 +118,8 @@ public class FileInPackets implements Runnable {
     }
 
     private void sendRequest(byte[] packet, int packetNum) {
-        String req = "POST " + uri + CR_LF
-                + "Length=" + packet.length + CR_LF;
+        String req = "POST " + uri + CR_LF;
+        String len = "Length=" + packet.length + CR_LF;
         byte[] byteReq = req.getBytes();
         Long crc = calculateCrc(packet);
 
@@ -135,6 +135,8 @@ public class FileInPackets implements Runnable {
             if (outputStream != null) {
                 outputStream.write(req.getBytes());
                 textWin.append("<<" + req + "\n");
+                outputStream.write(len.getBytes());
+                textWin.append("<<" + len + "\n");
                 outputStream.write(packet);
                 textWin.append("<<" + "Packet number: " + packetNum + "\n");
                 outputStream.write(crc.byteValue());
