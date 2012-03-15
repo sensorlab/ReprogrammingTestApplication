@@ -5,6 +5,8 @@
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 import javax.swing.JTextArea;
@@ -75,27 +77,30 @@ public class FileInPackets implements Runnable {
 
             byte[] packet = packets.get(i);
             sendRequest(packet, i);
-            String recievedStr = "";
-            int rbyte = 0;   //recieved byte       
+
             try {
-                long start = System.currentTimeMillis();
-                while (inputStream != null && ((rbyte = inputStream.read()) != -1)) {
-                    if (rbyte != 0) {
-                        recievedStr += (char) rbyte;                        
-                        long stop = System.currentTimeMillis();
-                        if (recievedStr.contains("error" + CR_LF + "OK" + CR_LF) || (stop - start) > 60 * SECOND) {                            
-                            textWin.append("##Retransmitting packet: " + i + "\n");
-                            retransmissionCounter++;
-                            i--;
-                            break;
-                        } else if (recievedStr.contains("OK" + CR_LF) && !recievedStr.contains("error")) {                            
-                            transmissionCounter = i;
-                            break;
-                        }
-                    }
-                }                
+                int available = inputStream.available();
+                byte chunk[] = new byte[available];
+                inputStream.read(chunk, 0, available);
+                String recievedStr = new String(chunk);
+                System.out.println(recievedStr);
+                if (recievedStr.contains("error" + CR_LF + "OK" + CR_LF)) {
+                    textWin.append("##Retransmitting packet: " + i + "\n");
+                    retransmissionCounter++;
+                    i--;
+                    break;
+                } else if (recievedStr.contains("OK" + CR_LF) && !recievedStr.contains("error")) {
+                    transmissionCounter = i;
+                    break;
+                }
             } catch (IOException ex) {
                 ex.printStackTrace();
+            } finally {
+                try {
+                    inputStream.close();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
             }
         }
         if (transmissionCounter == packets.size()) {
@@ -145,6 +150,12 @@ public class FileInPackets implements Runnable {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
+        } finally {
+            try {
+                outputStream.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 

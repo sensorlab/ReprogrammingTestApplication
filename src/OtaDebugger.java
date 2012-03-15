@@ -249,12 +249,12 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
         //Send button is the same action as hitting Enter on the textbar
         textbarActionPerformed(evt);
     }//GEN-LAST:event_SendButtonActionPerformed
-
+    
     private void clearButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearButtonActionPerformed
         //remove all text from the window
         textWin.replaceRange("", 0, textWin.getText().length());
 }//GEN-LAST:event_clearButtonActionPerformed
-
+    
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         //when user closes, make sure to close open ports and open I/O streams       
         if (portIdentifier.isCurrentlyOwned()) { //if port open, close port
@@ -283,7 +283,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
             textWin.append("##Port " + portName + " is now closed.\n");
         }
     }//GEN-LAST:event_formWindowClosing
-
+    
     private void baudButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_baudButtonActionPerformed
         //only change baud when port is closed
         boolean reopen = false;
@@ -310,7 +310,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
             }
         }
     }//GEN-LAST:event_baudButtonActionPerformed
-
+    
     private void portToggleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_portToggleActionPerformed
         //only open valid port. portList[0]="select port" - not a valid port
         //if ((String)portBox.getSelectedItem() == portList[0]) {
@@ -344,7 +344,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
                 serialPort.close();
             }
             System.out.println("closed serial port.");
-
+            
             open = false;
             textWin.append("##Port " + portName + " is now closed.\n");
         } else {//else port is closed, so open it
@@ -383,10 +383,10 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
             inputStream = serialPort.getInputStream();
             outputStream = serialPort.getOutputStream();
             open = true;
-
+            
         }
     }
-
+    
     private void portBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_portBoxActionPerformed
         if (open == true) { //if port open, make user close port before changing port
             textWin.append("##Must Close Port Before Changing Port.\n");
@@ -396,7 +396,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
             textWin.append("##Port Selected: " + portName + ", Baud Rate: " + baudRate + ".\n");
         }
     }//GEN-LAST:event_portBoxActionPerformed
-
+    
     private void textbarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textbarActionPerformed
         String text = textbar.getText();    //get text from field
         textWin.append("<<" + text + "\n");   //write text to terminal followed by new line
@@ -411,28 +411,32 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
             }
         }
     }//GEN-LAST:event_textbarActionPerformed
-
+    
     private void baudFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_baudFieldActionPerformed
         //hitting "enter" does the same thing as pressing the "Set Baud" button
         baudButtonActionPerformed(evt);
     }//GEN-LAST:event_baudFieldActionPerformed
-
+    
     private void uploadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uploadButtonActionPerformed
-        if (file != null && uriTextField != null) {
-            firmware = new FileInPackets(file, inputStream, outputStream, textWin, uriTextField.getText());
-            new Thread(firmware).start();
+        if (open) {
+            if (file != null && uriTextField != null) {
+                firmware = new FileInPackets(file, inputStream, outputStream, textWin, uriTextField.getText());
+                new Thread(firmware).start();
+            } else {
+                textWin.append("##No file selected.\n");
+            }
         } else {
-            textWin.append("##No file selected.\n");
+            textWin.append("##Serial port is not opened.\n");
         }
     }//GEN-LAST:event_uploadButtonActionPerformed
-
+    
     private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
         int returnVal = fc.showOpenDialog(OtaDebugger.this);
         file = fc.getSelectedFile();
-
+        
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             firmwareTextField.setText(file.getAbsolutePath());
-
+            
             try {
                 FileInputStream fin = new FileInputStream(file);
                 try {
@@ -496,7 +500,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
             case SerialPortEvent.DATA_AVAILABLE:
                 byte[] buffer = new byte[MAX_DATA];   //create a buffer (enlarge if buffer overflow occurs)
                 int int16value;
-
+                
                 switch (displayFormat) {
                     case ASCII: {
                         try {   //read the input stream and store to buffer, count number of bytes read
@@ -505,7 +509,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
                             inputStream.read(chunk, 0, available);
 
                             // Displayed results are codepage dependent
-                            textWin.append("\n>>"+new String(chunk));                            
+                            textWin.append(">>" + new String(chunk));
                             
                         } catch (IOException ex) {
                             ex.printStackTrace();
@@ -537,10 +541,10 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
         }
         return;
     }
-
+    
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
-
+            
             public void run() {
                 new OtaDebugger().setVisible(true);
             }
@@ -582,9 +586,9 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
     private JFileChooser fc;
     private File file;
     private FileInPackets firmware;
-
+    
     public enum RxFormat {
-
+        
         ASCII, INT16;
     }
     private RxFormat displayFormat;
