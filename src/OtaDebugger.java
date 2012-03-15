@@ -420,7 +420,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
     private void uploadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uploadButtonActionPerformed
         if (file != null && uriTextField != null) {
             firmware = new FileInPackets(file, inputStream, outputStream, textWin, uriTextField.getText());
-            firmware.run();
+            new Thread(firmware).start();
         } else {
             textWin.append("##No file selected.\n");
         }

@@ -81,21 +81,19 @@ public class FileInPackets implements Runnable {
                 long start = System.currentTimeMillis();
                 while (inputStream != null && ((rbyte = inputStream.read()) != -1)) {
                     if (rbyte != 0) {
-                        recievedStr += (char) rbyte;
+                        recievedStr += (char) rbyte;                        
                         long stop = System.currentTimeMillis();
-                        if (recievedStr.contains("error" + CR_LF + "OK" + CR_LF) || (stop - start) > 60 * SECOND) {
-                            textWin.append(">>" + recievedStr.replace(CR_LF, "\n"));
+                        if (recievedStr.contains("error" + CR_LF + "OK" + CR_LF) || (stop - start) > 60 * SECOND) {                            
                             textWin.append("##Retransmitting packet: " + i + "\n");
                             retransmissionCounter++;
                             i--;
                             break;
-                        } else if (recievedStr.contains("OK" + CR_LF) && !recievedStr.contains("error")) {
-                            textWin.append(">>" + recievedStr.replace(CR_LF, "\n"));
+                        } else if (recievedStr.contains("OK" + CR_LF) && !recievedStr.contains("error")) {                            
                             transmissionCounter = i;
                             break;
                         }
                     }
-                }
+                }                
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
@@ -138,7 +136,7 @@ public class FileInPackets implements Runnable {
                 outputStream.write(len.getBytes());
                 textWin.append("<<" + len + "\n");
                 outputStream.write(packet);
-                textWin.append("<<" + "Packet number: " + packetNum + "\n");
+                textWin.append("##" + "Packet number: " + packetNum + "\n");
                 outputStream.write(crc.byteValue());
                 textWin.append("<<" + crc + "\n");
                 outputStream.write(CR_LF.getBytes());
