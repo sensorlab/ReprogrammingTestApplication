@@ -495,18 +495,18 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
         switch (event.getEventType()) {
             case SerialPortEvent.DATA_AVAILABLE:
                 byte[] buffer = new byte[MAX_DATA];   //create a buffer (enlarge if buffer overflow occurs)
-                int numBytes = 0;   //how many bytes read (smaller than buffer)
                 int int16value;
 
                 switch (displayFormat) {
                     case ASCII: {
                         try {   //read the input stream and store to buffer, count number of bytes read
-                            while ((numBytes = inputStream.read(buffer)) > 0) {
-                                //convert to string of size numBytes
-                                String str = new String(buffer).substring(0, numBytes);
-                                str = str.replace("\r\n", "\n"); //replace CRLF with Newline
-                                textWin.append(">>" + str);        //write to terminal
-                            }
+                            int available = inputStream.available();
+                            byte chunk[] = new byte[available];
+                            inputStream.read(chunk, 0, available);
+
+                            // Displayed results are codepage dependent
+                            textWin.append("\n>>"+new String(chunk));                            
+                            
                         } catch (IOException ex) {
                             ex.printStackTrace();
                         }
