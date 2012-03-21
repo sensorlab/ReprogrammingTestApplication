@@ -10,6 +10,8 @@ import java.util.logging.Logger;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 import javax.swing.JTextArea;
+import javax.swing.text.BadLocationException;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 /**
  *
@@ -68,6 +70,8 @@ public class FileInPackets implements Runnable {
     public void sendPackets() {
         ArrayList<byte[]> packets = getOtaPackets();
 
+        int lastTextLength = textWin.getText().length();
+
         int transmissionCounter = 0;
         int retransmissionCounter = 0;
         for (int i = 0; i < packets.size(); i++) {
@@ -75,25 +79,54 @@ public class FileInPackets implements Runnable {
                 break;
             }
 
+
             byte[] packet = packets.get(i);
             sendRequest(packet, i);
 
+            final String MESSAGE_END = "\r\nOK\r\n";
+
+            Integer waitLock = new Integer(1);
+
             try {
-                int available = inputStream.available();
-                byte chunk[] = new byte[available];
-                inputStream.read(chunk, 0, available);
-                String recievedStr = new String(chunk);
-                System.out.println(recievedStr);
-                if (recievedStr.contains("error" + CR_LF + "OK" + CR_LF)) {
+
+                StringBuilder recvBuilder = new StringBuilder();
+                do {
+                    // wait 10 ms
+                    synchronized(waitLock){
+                        try{
+                            waitLock.wait(10);
+                        } catch(InterruptedException e){
+                            e.printStackTrace();
+                        }
+                    }
+                    // get data
+                    // FIXME reading data from the text window is a major hack...
+                    // otherwise major refactoring is needed, to properly 
+                    // multiplex the data between GUI and firmware transmission
+                    int newLength = textWin.getText().length();
+                    String recievedStr = textWin.getText(lastTextLength, 
+                            newLength - lastTextLength);
+                    /*
+                    int available = inputStream.available();
+                    byte chunk[] = new byte[available];
+                    inputStream.read(chunk, 0, available);
+                    String recievedStr = new String(chunk);
+                    */
+                    System.out.println(recievedStr);
+                    recvBuilder.append(recievedStr);
+                } while(!recvBuilder.toString().contains(MESSAGE_END));
+
+                if (recvBuilder.toString().contains("error" + CR_LF + "OK" + CR_LF)) {
                     textWin.append("##Retransmitting packet: " + i + "\n");
                     retransmissionCounter++;
                     i--;
                     break;
-                } else if (recievedStr.contains("OK" + CR_LF) && !recievedStr.contains("error")) {
-                    transmissionCounter = i;
-                    break;
+                } else if (recvBuilder.toString().contains("OK" + CR_LF) && 
+                        (!recvBuilder.toString().contains("error"))) {
+                    System.out.println("packet transmitted successfully");
+                    transmissionCounter = i + 1;
                 }
-            } catch (IOException ex) {
+            } catch (BadLocationException ex) {
                 ex.printStackTrace();
             } finally {
                 try {
