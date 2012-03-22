@@ -513,10 +513,13 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
                             byte chunk[] = new byte[available];
                             inputStream.read(chunk, 0, available);
 
-                            //add character to buffer
-                            sharedBuffer = new ArrayBlockingQueue<Character>(available);
-                            for (int i = 0; i < available; i++) {
-                                sharedBuffer.add((char) chunk[i]);
+                            if (firmwareUpload) {
+                                //add character to buffer                            
+                                for (int i = 0; i < available; i++) {
+                                    sharedBuffer.add((char) chunk[i]);
+                                }
+                            } else {
+                                sharedBuffer.clear();
                             }
 
                             // Displayed results are codepage dependent
@@ -597,7 +600,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
     private JFileChooser fc;
     private File file;
     private FileInPackets firmware;
-    public static ArrayBlockingQueue<Character> sharedBuffer;
+    public static ArrayBlockingQueue<Character> sharedBuffer = new ArrayBlockingQueue<Character>(10000, true);
     public static boolean firmwareUpload = false;
 
     public enum RxFormat {

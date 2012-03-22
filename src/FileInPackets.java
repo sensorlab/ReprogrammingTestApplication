@@ -75,6 +75,7 @@ public class FileInPackets implements Runnable {
                 break;
             }
 
+            OtaDebugger.sharedBuffer.clear();
             byte[] packet = packets.get(i);
             sendRequest(packet, i);
 
