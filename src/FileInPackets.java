@@ -86,20 +86,21 @@ public class FileInPackets implements Runnable {
 
                 String recievedStr = "";
                 if (OtaDebugger.sharedBuffer != null) {
-                    for (int j = 0; i < OtaDebugger.sharedBuffer.size(); j++) {
+                     int len = OtaDebugger.sharedBuffer.size();
+                    for (int j = 0; j < len; j++) {                    
                         recievedStr += OtaDebugger.sharedBuffer.poll();
                     }
                 }
                 
-                if (recievedStr.contains("OK") && !recievedStr.contains("corrupted-data") && !recievedStr.contains("junk-input")) {
+                if (recievedStr.contains("OK" + CR_LF) && !recievedStr.contains("corrupted-data") && !recievedStr.contains("junk-input")) {
                     transmissionCounter = i;
                     noResponse = false;
-                } else if (recievedStr.contains("corrupted-data" + CR_LF + "OK")) {
+                } else if (recievedStr.contains("corrupted-data" + CR_LF + "OK" + CR_LF)) {
                     textWin.append("##Retransmitting packet: " + i + "\n");
                     retransmissionCounter++;
                     i--;
                     noResponse = false;
-                } else if (recievedStr.contains("junk-input" + CR_LF + "OK")) {
+                } else if (recievedStr.contains("junk-input" + CR_LF + "OK" + CR_LF)) {
                     try {
                         outputStream.write("\r\n\r\n\r\n\r\n\r\n".getBytes());
                     } catch (IOException ex) {
