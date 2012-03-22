@@ -167,9 +167,7 @@ public class FileInPackets implements Runnable {
                 outputStream.write(packet);
                 outputStream.write(CR_LF.getBytes());
                 textWin.append("##" + "Packet number: " + packetNum + "\n");
-                outputStream.write(crc.byteValue());
                 textWin.append("<<" + crc + "\n");
-                outputStream.write(CR_LF.getBytes());
                 outputStream.write(strCrc.getBytes());
                 textWin.append("<<" + strCrc + "\n");
             }
