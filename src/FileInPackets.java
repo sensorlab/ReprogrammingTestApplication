@@ -24,8 +24,9 @@ public class FileInPackets implements Runnable {
     private OutputStream outputStream;
     private JTextArea textWin;
     private String uri;
+    private OtaDebugger otaDebugger;
 
-    public FileInPackets(File otaImage, InputStream inputStream,
+    public FileInPackets(OtaDebugger otaDebugger, File otaImage, InputStream inputStream,
             OutputStream outputStream, JTextArea textWin, String uri) {        
         this.otaImage = otaImage;
         otaImageSize = otaImage.length();
@@ -33,6 +34,7 @@ public class FileInPackets implements Runnable {
         this.outputStream = outputStream;
         this.textWin = textWin;
         this.uri = uri;
+        this.otaDebugger = otaDebugger;
         
         OtaDebugger.firmwareUpload = true;
     }
@@ -76,6 +78,10 @@ public class FileInPackets implements Runnable {
             }
 
             byte[] packet = packets.get(i);
+
+            // clean up the buffer
+            otaDebugger.sharedBuffer.clear();
+
             sendRequest(packet, i);
 
             boolean noResponse = true;
@@ -84,9 +90,12 @@ public class FileInPackets implements Runnable {
                 long stop = System.currentTimeMillis();
 
                 String recievedStr = "";
-                if (OtaDebugger.sharedBuffer != null) {
-                    for (int j = 0; i < OtaDebugger.sharedBuffer.size(); j++) {
-                        recievedStr += OtaDebugger.sharedBuffer.poll();
+
+                synchronized(otaDebugger){
+
+                    int len = otaDebugger.sharedBuffer.size();
+                    for (int j = 0; j < len; j++) {
+                        recievedStr += otaDebugger.sharedBuffer.poll();
                     }
                 }
                 
@@ -108,12 +117,15 @@ public class FileInPackets implements Runnable {
                     retransmissionCounter++;
                     i--;
                     noResponse = false;
-                } else if ((stop - start) > 2 * SECOND) {
+                } else if ((stop - start) > 10 * SECOND) {
                     try {
                         outputStream.write("\r\n\r\n\r\n\r\n\r\n".getBytes());
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
+                    System.out.println("---");
+                    System.out.println(recievedStr);
+                    System.out.println("--/--");
                     textWin.append("##Timeout, retransmitting packet: " + i + "\n");
                     retransmissionCounter++;
                     i--;

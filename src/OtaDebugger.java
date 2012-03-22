@@ -35,6 +35,8 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
         textWin.append("##Select Port, Specify Baud Rate (default " + baudRate + "), Open Port.\n");
         //Create a file chooser
         fc = new JFileChooser();
+        // create buffer
+        sharedBuffer = new ArrayBlockingQueue<Character>(1000000);
     }
 
     /**
@@ -422,7 +424,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
         if (!firmwareUpload) {
             if (open) {
                 if (file != null && uriTextField != null) {
-                    firmware = new FileInPackets(file, inputStream, outputStream, textWin, uriTextField.getText());
+                    firmware = new FileInPackets(this, file, inputStream, outputStream, textWin, uriTextField.getText());
                     new Thread(firmware).start();
                 } else {
                     textWin.append("##No file selected.\n");
@@ -513,12 +515,13 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
                             byte chunk[] = new byte[available];
                             inputStream.read(chunk, 0, available);
 
-                            //add character to buffer
-                            sharedBuffer = new ArrayBlockingQueue<Character>(available);
-                            for (int i = 0; i < available; i++) {
-                                sharedBuffer.add((char) chunk[i]);
+                            // FIXME clean-up...
+                            synchronized(this){
+                                //add character to buffer
+                                for (int i = 0; i < available; i++) {
+                                    sharedBuffer.add((char) chunk[i]);
+                                }
                             }
-
                             // Displayed results are codepage dependent
                             textWin.append(new String(chunk).replace("\r\n", "\n"));
 
@@ -597,7 +600,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
     private JFileChooser fc;
     private File file;
     private FileInPackets firmware;
-    public static ArrayBlockingQueue<Character> sharedBuffer;
+    public ArrayBlockingQueue<Character> sharedBuffer;
     public static boolean firmwareUpload = false;
 
     public enum RxFormat {
