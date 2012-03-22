@@ -11,8 +11,6 @@ import java.io.*;
 import java.util.Enumeration;
 import java.util.TooManyListenersException;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.BlockingQueue;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 import javax.swing.JFileChooser;
@@ -421,15 +419,19 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
     }//GEN-LAST:event_baudFieldActionPerformed
 
     private void uploadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uploadButtonActionPerformed
-        if (open) {
-            if (file != null && uriTextField != null) {
-                firmware = new FileInPackets(file, inputStream, outputStream, textWin, uriTextField.getText());
-                new Thread(firmware).start();
+        if (!firmwareUpload) {
+            if (open) {
+                if (file != null && uriTextField != null) {
+                    firmware = new FileInPackets(file, inputStream, outputStream, textWin, uriTextField.getText());
+                    new Thread(firmware).start();
+                } else {
+                    textWin.append("##No file selected.\n");
+                }
             } else {
-                textWin.append("##No file selected.\n");
+                textWin.append("##Serial port is not opened.\n");
             }
         } else {
-            textWin.append("##Serial port is not opened.\n");
+            textWin.append("##Firmware upload already in process.\n");
         }
     }//GEN-LAST:event_uploadButtonActionPerformed
 
@@ -596,6 +598,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
     private File file;
     private FileInPackets firmware;
     public static ArrayBlockingQueue<Character> sharedBuffer;
+    public static boolean firmwareUpload = false;
 
     public enum RxFormat {
 
