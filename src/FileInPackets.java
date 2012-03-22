@@ -14,7 +14,7 @@ import javax.swing.JTextArea;
  * @author Matevz
  */
 public class FileInPackets implements Runnable {
-  
+
     private static final int PACKET_SIZE = 512;
     private static final int SECOND = 1000;
     private static final String CR_LF = "\r\n";
@@ -26,14 +26,14 @@ public class FileInPackets implements Runnable {
     private String uri;
 
     public FileInPackets(File otaImage, InputStream inputStream,
-            OutputStream outputStream, JTextArea textWin, String uri) {        
+            OutputStream outputStream, JTextArea textWin, String uri) {
         this.otaImage = otaImage;
         otaImageSize = otaImage.length();
         this.inputStream = inputStream;
         this.outputStream = outputStream;
         this.textWin = textWin;
         this.uri = uri;
-        
+
         OtaDebugger.firmwareUpload = true;
     }
 
@@ -86,12 +86,12 @@ public class FileInPackets implements Runnable {
 
                 String recievedStr = "";
                 if (OtaDebugger.sharedBuffer != null) {
-                     int len = OtaDebugger.sharedBuffer.size();
-                    for (int j = 0; j < len; j++) {                    
+                    int len = OtaDebugger.sharedBuffer.size();
+                    for (int j = 0; j < len; j++) {
                         recievedStr += OtaDebugger.sharedBuffer.poll();
                     }
                 }
-                
+
                 if (recievedStr.contains("OK" + CR_LF) && !recievedStr.contains("corrupted-data") && !recievedStr.contains("junk-input")) {
                     transmissionCounter = i;
                     noResponse = false;
@@ -128,8 +128,8 @@ public class FileInPackets implements Runnable {
                 }
             }
         }
-        if (transmissionCounter == packets.size()-1) {
-            textWin.append("##Firmware successfully uploaded.\n");            
+        if (transmissionCounter == packets.size() - 1) {
+            textWin.append("##Firmware successfully uploaded.\n");
         } else {
             textWin.append("##Fatal error transmitting firmware.\n");
         }
