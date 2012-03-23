@@ -600,7 +600,8 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
     private JFileChooser fc;
     private File file;
     private FileInPackets firmware;
-    public static ArrayBlockingQueue<Character> sharedBuffer = new ArrayBlockingQueue<Character>(10000, true);
+    static final int KB = 1024;
+    public static ArrayBlockingQueue<Character> sharedBuffer = new ArrayBlockingQueue<Character>(10*KB, true);
     public static boolean firmwareUpload = false;
 
     public enum RxFormat {
@@ -610,5 +611,5 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
     private RxFormat displayFormat;
     //constants
     static final int MAX_PORTS = 20;    //maximum number of ports to look for
-    static final int MAX_DATA = 64;//maximum length of serial data received
+    static final int MAX_DATA = 64;//maximum length of serial data received    
 }
