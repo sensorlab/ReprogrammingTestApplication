@@ -516,7 +516,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
                             if (firmwareUpload) {
                                 //add character to buffer                            
                                 for (int i = 0; i < available; i++) {
-                                    sharedBuffer.add((char) chunk[i]);
+                                    sharedBuffer.put((char) chunk[i]);
                                 }
                             } else {
                                 sharedBuffer.clear();
@@ -525,7 +525,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
                             // Displayed results are codepage dependent
                             textWin.append(new String(chunk).replace("\r\n", "\n"));
 
-                        } catch (IOException ex) {
+                        } catch (Exception ex) {
                             ex.printStackTrace();
                         }
                         break;
