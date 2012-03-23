@@ -88,7 +88,7 @@ public class FileInPackets implements Runnable {
                 if (OtaDebugger.sharedBuffer != null) {
                     int len = OtaDebugger.sharedBuffer.size();
                     for (int j = 0; j < len; j++) {
-                        if (OtaDebugger.sharedBuffer.poll() != null) {
+                        if (OtaDebugger.sharedBuffer.peek() != null) {
                             recievedStr += OtaDebugger.sharedBuffer.poll();
                         }
                     }
