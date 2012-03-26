@@ -7,12 +7,17 @@
  */
 
 import gnu.io.*;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.TooManyListenersException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
+import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.UIManager;
 
@@ -35,6 +40,13 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
         textWin.append("##Select Port, Specify Baud Rate (default " + baudRate + "), Open Port.\n");
         //Create a file chooser
         fc = new JFileChooser();
+    }
+
+    @Override
+    public List<Image> getIconImages() {
+        ArrayList<Image> imageList = new ArrayList();
+        imageList.add(new ImageIcon(System.getProperty("user.dir") + System.getProperty("file.separator") + "IJS_icon.png").getImage());
+        return imageList;
     }
 
     /**
@@ -601,7 +613,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
     private File file;
     private FileInPackets firmware;
     static final int KB = 1024;
-    public static ArrayBlockingQueue<Character> sharedBuffer = new ArrayBlockingQueue<Character>(10*KB, true);
+    public static ArrayBlockingQueue<Character> sharedBuffer = new ArrayBlockingQueue<Character>(10 * KB, true);
     public static boolean firmwareUpload = false;
 
     public enum RxFormat {
