@@ -44,7 +44,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
 
     @Override
     public List<Image> getIconImages() {
-        ArrayList<Image> imageList = new ArrayList();
+        ArrayList<Image> imageList = new ArrayList<Image>();
         imageList.add(new ImageIcon(System.getProperty("user.dir") + System.getProperty("file.separator") + "IJS_icon.png").getImage());
         return imageList;
     }
