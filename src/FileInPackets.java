@@ -156,8 +156,8 @@ public class FileInPackets implements Runnable {
 
         Checksum checksum = new CRC32();
         checksum.update(byteReq, 0, byteReq.length);
-        checksum.update(packet, 0, packet.length);
-        checksum.update(crc.intValue());
+        checksum.update(len.getBytes(), 0, len.length());
+        checksum.update(packet, 0, packet.length);        
         checksum.update(CR_LF.getBytes(), 0, CR_LF.getBytes().length);
 
         long reqCrc = checksum.getValue();
