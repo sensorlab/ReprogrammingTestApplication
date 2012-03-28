@@ -166,6 +166,12 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
 
         uriLabel.setText("URI:");
 
+        uriTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                uriTextFieldActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -479,6 +485,10 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
             file = null;
         }
     }//GEN-LAST:event_browseButtonActionPerformed
+
+    private void uriTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uriTextFieldActionPerformed
+        uploadButtonActionPerformed(evt);
+    }//GEN-LAST:event_uriTextFieldActionPerformed
     /*
      * private void listPorts() { //display available ports to the terminal
      * Enumeration portEnum = CommPortIdentifier.getPortIdentifiers(); while (

@@ -4,6 +4,7 @@
  */
 
 import java.io.*;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
@@ -54,6 +55,16 @@ public class FileInPackets implements Runnable {
                     }
                 }
                 otaPackets.add(packetBuffer);
+
+                // fill the last buffer with FFs
+                int packetsLen = otaPackets.size() * PACKET_SIZE;
+                int numOfFF = packetsLen - (int) otaImageSize;
+                for (int i = 0; i < numOfFF; i++) {
+                    byte[] lastPacket = otaPackets.get(otaPackets.size() - 1);
+                    lastPacket[(lastPacket.length - 1) - i] = (byte) 255;
+                    otaPackets.set(otaPackets.size() - 1, lastPacket);
+                }
+                addPacketsHeader(otaPackets);
             } catch (Exception ex) {
                 ex.printStackTrace();
             } finally {
@@ -63,6 +74,30 @@ public class FileInPackets implements Runnable {
             ex.printStackTrace();
         }
         return otaPackets;
+    }
+
+    public byte[] intToByteArray(int value) {
+        return new byte[]{
+                    (byte) (value >>> 24),
+                    (byte) (value >>> 16),
+                    (byte) (value >>> 8),
+                    (byte) value};
+    }
+
+    public ArrayList<byte[]> addPacketsHeader(ArrayList<byte[]> packets) {
+        for (int i = 0; i < packets.size(); i++) {
+            ByteArrayOutputStream os = new ByteArrayOutputStream(PACKET_SIZE + 8);
+            byte[] offset = intToByteArray(i);
+            os.write(offset, 0, offset.length);
+            int tmp = packets.get(i).length;
+            os.write(packets.get(i), 0, packets.get(i).length);
+            long numCrc = calculateCrc(os.toByteArray());
+            byte[] crc = ByteBuffer.allocate(8).putLong(numCrc).array();
+            os.write(crc, 4, crc.length - 4);
+            packets.set(i, os.toByteArray());
+        }
+
+        return packets;
     }
 
     public void sendPackets() {
@@ -150,14 +185,15 @@ public class FileInPackets implements Runnable {
 
     private void sendRequest(byte[] packet, int packetNum) {
         String req = "POST " + uri + CR_LF;
-        String len = "Length=" + packet.length + CR_LF;
+        int dataLen = packet.length;
+        String len = "Length=" + dataLen + CR_LF;
         byte[] byteReq = req.getBytes();
         Long crc = calculateCrc(packet);
 
         Checksum checksum = new CRC32();
         checksum.update(byteReq, 0, byteReq.length);
         checksum.update(len.getBytes(), 0, len.length());
-        checksum.update(packet, 0, packet.length);        
+        checksum.update(packet, 0, packet.length);
         checksum.update(CR_LF.getBytes(), 0, CR_LF.getBytes().length);
 
         long reqCrc = checksum.getValue();
