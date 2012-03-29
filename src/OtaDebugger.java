@@ -355,13 +355,11 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
                     ex.printStackTrace();
                 }
             }
-            //close serial port
-            System.out.println("closing serial port.");
+            //close serial port            
             serialPort.removeEventListener();
             if (serialPort != null) {
                 serialPort.close();
-            }
-            System.out.println("closed serial port.");
+            }            
 
             open = false;
             textWin.append("##Port " + portName + " is now closed.\n");
@@ -381,8 +379,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
             }
             serialPort.notifyOnDataAvailable(true);
             textWin.append("##Port opened.\n");
-        }
-        System.out.println("end of toggle function");
+        }        
     }//GEN-LAST:event_portToggleActionPerformed
 
     //open serial port
@@ -390,7 +387,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
         //make sure port is not currently in use
         portIdentifier = CommPortIdentifier.getPortIdentifier(portName);
         if (portIdentifier.isCurrentlyOwned()) {
-            System.out.println("Error: Port is currently in use");
+            textWin.append("##Error: Port is currently in use");
         } else {
             //create CommPort and identify available serial/parallel ports
             commPort = portIdentifier.open(this.getClass().getName(), 2000);
