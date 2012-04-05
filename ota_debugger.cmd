@@ -1,1 +1,1 @@
-java -jar dist/OtaDebugger.jar
+start javaw -jar dist/OtaDebugger.jar

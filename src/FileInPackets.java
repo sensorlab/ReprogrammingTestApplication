@@ -147,7 +147,7 @@ public class FileInPackets implements Runnable {
                     retransmissionCounter++;
                     i--;
                     noResponse = false;
-                } else if ((stop - start) > 2 * SECOND) {
+                } else if ((stop - start) > 30 * SECOND) {
                     try {
                         outputStream.write("\r\n\r\n\r\n\r\n\r\n".getBytes());
                     } catch (IOException ex) {
