@@ -106,7 +106,7 @@ public class FileInPackets implements Runnable {
         int transmissionCounter = 0;
         int retransmissionCounter = 0;
         for (int i = 0; i < packets.size(); i++) {
-            if (retransmissionCounter >= 2) {
+            if (retransmissionCounter >= 10) {
                 break;
             }
 
@@ -132,12 +132,12 @@ public class FileInPackets implements Runnable {
                 if (recievedStr.contains("OK" + CR_LF) && !recievedStr.contains("corrupted-data") && !recievedStr.contains("junk-input")) {
                     transmissionCounter = i;
                     noResponse = false;
-                } else if (recievedStr.contains("corrupted-data" + CR_LF + "OK" + CR_LF)) {
+                } else if (recievedStr.contains("corrupted-data") && recievedStr.contains("OK" + CR_LF)) {
                     textWin.append("##Retransmitting packet: " + i + "\n");
                     retransmissionCounter++;
                     i--;
                     noResponse = false;
-                } else if (recievedStr.contains("junk-input" + CR_LF + "OK" + CR_LF)) {
+                } else if (recievedStr.contains("junk-input") && recievedStr.contains("OK" + CR_LF)) {
                     try {
                         outputStream.write("\r\n\r\n\r\n\r\n\r\n".getBytes());
                     } catch (IOException ex) {
