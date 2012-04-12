@@ -100,13 +100,13 @@ public class FileInPackets implements Runnable {
         return packets;
     }
 
-    public void sendPackets() {
+    public synchronized void sendPackets() {
         ArrayList<byte[]> packets = getOtaPackets();
 
         int transmissionCounter = 0;
         int retransmissionCounter = 0;
         for (int i = 0; i < packets.size(); i++) {
-            if (retransmissionCounter >= 10) {
+            if (retransmissionCounter >= 10 || !OtaDebugger.open) {
                 break;
             }
 
@@ -116,7 +116,7 @@ public class FileInPackets implements Runnable {
 
             boolean noResponse = true;
             long start = System.currentTimeMillis();
-            while (noResponse) {
+            while (noResponse && OtaDebugger.open) {
                 long stop = System.currentTimeMillis();
 
                 String recievedStr = "";
@@ -129,27 +129,31 @@ public class FileInPackets implements Runnable {
                     }
                 }
 
-                if (recievedStr.contains("OK" + CR_LF) && !recievedStr.contains("corrupted-data") && !recievedStr.contains("junk-input")) {
+                if (recievedStr.contains("OK" + CR_LF) && !recievedStr.contains("CORRUPTED-DATA") && !recievedStr.contains("JUNK-INPUT")) {
                     transmissionCounter = i;
                     noResponse = false;
-                } else if (recievedStr.contains("corrupted-data") && recievedStr.contains("OK" + CR_LF)) {
-                    textWin.append("##Retransmitting packet: " + i + "\n");
+                } else if (recievedStr.contains("CORRUPTED-DATA" + CR_LF + CR_LF + "OK" + CR_LF)) {
+                    textWin.append("##Error - CORRUPTED-DATA -> retransmitting packet: " + i + "\n");
                     retransmissionCounter++;
                     i--;
                     noResponse = false;
-                } else if (recievedStr.contains("junk-input") && recievedStr.contains("OK" + CR_LF)) {
+                } else if (recievedStr.contains("JUNK-INPUT" + CR_LF + CR_LF + "OK" + CR_LF)) {
                     try {
-                        outputStream.write("\r\n\r\n\r\n\r\n\r\n".getBytes());
+                        for (int j = 0; j < 5; j++) {
+                            outputStream.write(CR_LF.getBytes());
+                        }
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
-                    textWin.append("##Retransmitting packet: " + i + "\n");
+                    textWin.append("##Error - JUNK-INPUT -> retransmitting packet: " + i + "\n");
                     retransmissionCounter++;
                     i--;
                     noResponse = false;
                 } else if ((stop - start) > 30 * SECOND) {
                     try {
-                        outputStream.write("\r\n\r\n\r\n\r\n\r\n".getBytes());
+                        for (int j = 0; j < 5; j++) {
+                            outputStream.write(CR_LF.getBytes());
+                        }
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
@@ -188,7 +192,6 @@ public class FileInPackets implements Runnable {
         int dataLen = packet.length;
         String len = "Length=" + dataLen + CR_LF;
         byte[] byteReq = req.getBytes();
-        Long crc = calculateCrc(packet);
 
         Checksum checksum = new CRC32();
         checksum.update(byteReq, 0, byteReq.length);
@@ -201,13 +204,12 @@ public class FileInPackets implements Runnable {
         try {
             if (outputStream != null) {
                 outputStream.write(req.getBytes());
-                textWin.append("<<" + req + "\n");
+                textWin.append("\n<<" + req);
                 outputStream.write(len.getBytes());
-                textWin.append("<<" + len + "\n");
+                textWin.append("<<" + len);
                 outputStream.write(packet);
                 outputStream.write(CR_LF.getBytes());
                 textWin.append("##" + "Packet number: " + packetNum + "\n");
-                textWin.append("<<" + crc + "\n");
                 outputStream.write(strCrc.getBytes());
                 textWin.append("<<" + strCrc + "\n");
             }

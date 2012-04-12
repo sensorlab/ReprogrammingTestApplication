@@ -44,7 +44,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
     @Override
     public List<Image> getIconImages() {
         ArrayList<Image> imageList = new ArrayList<Image>();
-        imageList.add(new ImageIcon(System.getProperty("user.dir") + System.getProperty("file.separator") + "IJS_icon.png").getImage());
+        imageList.add(new ImageIcon(System.getProperty("user.dir") + System.getProperty("file.separator") + "SensorLab-Logo.png").getImage());
         return imageList;
     }
 
@@ -80,7 +80,8 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
         uriTextField = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("LOG-a-TEC Debugger");
+        setTitle("VESNA Remote Debugger");
+        setPreferredSize(new java.awt.Dimension(550, 550));
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
@@ -88,6 +89,8 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
         });
 
         textWin.setColumns(20);
+        textWin.setEditable(false);
+        textWin.setFont(new java.awt.Font("Courier New", 0, 11)); // NOI18N
         textWin.setLineWrap(true);
         textWin.setRows(5);
         scrollPane.setViewportView(textWin);
@@ -180,26 +183,26 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, jSeparator1)
                     .add(scrollPane)
-                    .add(layout.createSequentialGroup()
-                        .add(textbar)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                        .add(SendButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 102, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                    .add(layout.createSequentialGroup()
-                        .add(baudField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 56, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                        .add(baudButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 87, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 181, Short.MAX_VALUE)
-                        .add(clearButton))
-                    .add(layout.createSequentialGroup()
-                        .add(portBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 114, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .add(18, 18, 18)
-                        .add(portToggle, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .add(layout.createSequentialGroup()
-                        .add(firmwareLabel)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                        .add(uriLabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(firmwareTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 184, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(uriTextField)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(browseButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .add(uploadButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 208, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                            .add(layout.createSequentialGroup()
+                                .add(0, 0, 0)
+                                .add(baudField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 56, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(baudButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 91, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .add(layout.createSequentialGroup()
+                                .add(textbar)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)))
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                            .add(clearButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 102, Short.MAX_VALUE)
+                            .add(SendButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .add(layout.createSequentialGroup()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(layout.createSequentialGroup()
@@ -209,21 +212,25 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
                             .add(layout.createSequentialGroup()
                                 .add(crcLabel)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(crcNumLabel)))
-                        .add(0, 0, Short.MAX_VALUE))
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                        .add(uriLabel)
+                                .add(crcNumLabel))
+                            .add(layout.createSequentialGroup()
+                                .add(portBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 114, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(portToggle, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 159, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                        .add(0, 154, Short.MAX_VALUE))
+                    .add(layout.createSequentialGroup()
+                        .add(firmwareLabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(uriTextField)
+                        .add(firmwareTextField)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(uploadButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 208, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                        .add(browseButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 103, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(scrollPane, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 359, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(scrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 359, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(textbar, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -257,7 +264,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
                     .add(uploadButton)
                     .add(uriLabel)
                     .add(uriTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .add(23, 23, 23))
         );
 
         pack();
@@ -359,7 +366,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
             serialPort.removeEventListener();
             if (serialPort != null) {
                 serialPort.close();
-            }            
+            }
 
             open = false;
             textWin.append("##Port " + portName + " is now closed.\n");
@@ -379,7 +386,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
             }
             serialPort.notifyOnDataAvailable(true);
             textWin.append("##Port opened.\n");
-        }        
+        }
     }//GEN-LAST:event_portToggleActionPerformed
 
     //open serial port
@@ -413,18 +420,22 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
     }//GEN-LAST:event_portBoxActionPerformed
 
     private void textbarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textbarActionPerformed
-        String text = textbar.getText();    //get text from field
-        textWin.append("<<" + text + "\n");   //write text to terminal followed by new line
-        textbar.selectAll();                //highlight text so it can be easily overwritten
-        //if serial port open, write to serial port
-        if (open == true) {
-            text = text + "\r\n"; //append carriage return to text            
-            try {
-                outputStream.write(text.getBytes()); //write to serial port
-            } catch (IOException ex) {
-                ex.printStackTrace();
+        //if (!firmwareUpload) {
+            String text = textbar.getText();    //get text from field
+            textWin.append("<<" + text + "\n");   //write text to terminal followed by new line
+            textbar.selectAll();                //highlight text so it can be easily overwritten
+            //if serial port open, write to serial port
+            if (open == true) {
+                text = text + "\r\n"; //append carriage return to text            
+                try {
+                    outputStream.write(text.getBytes()); //write to serial port
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
             }
-        }
+        //} else {
+          //  textWin.append("##User error: Firmware being uploaded!\n");
+        //}
     }//GEN-LAST:event_textbarActionPerformed
 
     private void baudFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_baudFieldActionPerformed
@@ -445,7 +456,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
                 textWin.append("##Serial port is not opened.\n");
             }
         } else {
-            textWin.append("##Firmware upload already in process.\n");
+            textWin.append("##Firmware upload already in progress.\n");
         }
     }//GEN-LAST:event_uploadButtonActionPerformed
 
@@ -614,7 +625,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
     private InputStream inputStream;
     private OutputStream outputStream;
     private int baudRate = 115200;
-    private boolean open = false;
+    public static boolean open = false;
     private JFileChooser fc;
     private File file;
     private FileInPackets firmware;
