@@ -6,6 +6,7 @@
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 import javax.swing.JTextArea;
@@ -25,6 +26,7 @@ public class FileInPackets implements Runnable {
     private OutputStream outputStream;
     private JTextArea textWin;
     private String uri;
+    private LinkedBlockingQueue<Character> inputBuffer;
 
     public FileInPackets(File otaImage, InputStream inputStream,
             OutputStream outputStream, JTextArea textWin, String uri) {
@@ -35,7 +37,16 @@ public class FileInPackets implements Runnable {
         this.textWin = textWin;
         this.uri = uri;
 
+        inputBuffer = new LinkedBlockingQueue<Character>();
         OtaDebugger.firmwareUpload = true;
+    }
+
+    public void bufferAddChar(Character ch) {
+        inputBuffer.add(ch);
+    }
+
+    public void bufferClear() {
+        inputBuffer.clear();
     }
 
     public ArrayList<byte[]> getOtaPackets() {
@@ -110,7 +121,7 @@ public class FileInPackets implements Runnable {
                 break;
             }
 
-            OtaDebugger.sharedBuffer.clear();
+            inputBuffer.clear();
             byte[] packet = packets.get(i);
             sendRequest(packet, i);
 
@@ -120,17 +131,23 @@ public class FileInPackets implements Runnable {
                 long stop = System.currentTimeMillis();
 
                 String recievedStr = "";
-                if (OtaDebugger.sharedBuffer != null) {
-                    int len = OtaDebugger.sharedBuffer.size();
+                if (inputBuffer != null) {
+                    int len = inputBuffer.size();
                     for (int j = 0; j < len; j++) {
-                        if (OtaDebugger.sharedBuffer.peek() != null) {
-                            recievedStr += OtaDebugger.sharedBuffer.poll();
+                        if (inputBuffer.peek() != null) {
+                            recievedStr += inputBuffer.poll();
                         }
                     }
                 }
 
                 if (recievedStr.contains("OK" + CR_LF) && !recievedStr.contains("CORRUPTED-DATA") && !recievedStr.contains("JUNK-INPUT")) {
                     transmissionCounter = i;
+                    retransmissionCounter = 0;
+                    noResponse = false;
+                } else if (recievedStr.contains("ERROR" + CR_LF + CR_LF + "OK" + CR_LF)) {
+                    textWin.append("##Error - APPLICATION-ERROR -> retransmitting packet: " + i + "\n");
+                    retransmissionCounter++;
+                    i--;
                     noResponse = false;
                 } else if (recievedStr.contains("CORRUPTED-DATA" + CR_LF + CR_LF + "OK" + CR_LF)) {
                     textWin.append("##Error - CORRUPTED-DATA -> retransmitting packet: " + i + "\n");
