@@ -190,8 +190,9 @@ public class FileInPackets implements Runnable {
             textWin.append("##Firmware successfully uploaded.\n");
         } else {
             textWin.append("##Fatal error transmitting firmware.\n");
-        }
+        }        
         OtaDebugger.firmwareUpload = false;
+        inputBuffer.clear();
     }
 
     public long calculateCrc(byte[] otaPacket) {

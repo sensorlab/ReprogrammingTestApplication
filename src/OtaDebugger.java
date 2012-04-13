@@ -81,7 +81,6 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("VESNA Remote Debugger");
-        setPreferredSize(new java.awt.Dimension(550, 550));
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
@@ -225,7 +224,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
                                 .add(portBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 114, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(portToggle, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                        .add(0, 223, Short.MAX_VALUE))
+                        .add(0, 386, Short.MAX_VALUE))
                     .add(layout.createSequentialGroup()
                         .add(firmwareLabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -238,7 +237,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(scrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 359, Short.MAX_VALUE)
+                .add(scrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 253, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(textbar, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -276,7 +275,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
         );
 
         java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-489)/2, (screenSize.height-656)/2, 489, 656);
+        setBounds((screenSize.width-550)/2, (screenSize.height-550)/2, 550, 550);
     }// </editor-fold>//GEN-END:initComponents
 
     private void SendButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SendButtonActionPerformed
@@ -552,8 +551,6 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
                         for (int i = 0; i < available; i++) {
                             firmware.bufferAddChar((char) chunk[i]);
                         }
-                    } else {
-                        firmware.bufferClear();
                     }
 
                     // Display results
