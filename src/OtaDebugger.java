@@ -1,9 +1,6 @@
 /*
- * SerialGUI.java
- *
- * Created on November 5, 2007, 3:45 PM
- *
- * @author  Goldscott
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
  */
 
 import gnu.io.*;
@@ -20,6 +17,10 @@ import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.UIManager;
 
+/**
+ *
+ * @author Matevz
+ */
 public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventListener {
 
     /**
@@ -34,7 +35,6 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
         }
         getPorts();
         initComponents();
-        displayFormat = RxFormat.ASCII;
         //Display some instructions upon opening
         textWin.append("##Select Port, Specify Baud Rate (default " + baudRate + "), Open Port.\n");
         //Create a file chooser
@@ -405,7 +405,6 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
             inputStream = serialPort.getInputStream();
             outputStream = serialPort.getOutputStream();
             open = true;
-
         }
     }
 
@@ -532,58 +531,33 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
     public void serialEvent(SerialPortEvent event) {
         switch (event.getEventType()) {
             case SerialPortEvent.DATA_AVAILABLE:
-                byte[] buffer = new byte[MAX_DATA];   //create a buffer (enlarge if buffer overflow occurs)
-                int int16value;
 
-                switch (displayFormat) {
-                    case ASCII: {
-                        try {   //read the input stream and store to buffer, count number of bytes read
-                            int available = inputStream.available();
-                            byte chunk[] = new byte[available];
-                            inputStream.read(chunk, 0, available);
+                try {   //read the input stream and store to buffer, count number of bytes read
+                    int available = inputStream.available();
+                    byte chunk[] = new byte[available];
+                    inputStream.read(chunk, 0, available);
 
-                            if (firmwareUpload) {
-                                //add character to buffer                            
-                                for (int i = 0; i < available; i++) {
-                                    sharedBuffer.put((char) chunk[i]);
-                                }
-                            } else {
-                                sharedBuffer.clear();
-                            }
-
-                            // Displayed results are codepage dependent
-                            textWin.append(new String(chunk).replace("\r\n", "\n"));
-
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
+                    if (firmwareUpload) {
+                        //add character to buffer                            
+                        for (int i = 0; i < available; i++) {
+                            sharedBuffer.put((char) chunk[i]);
                         }
-                        break;
+                    } else {
+                        sharedBuffer.clear();
                     }
-                    case INT16: {
-                        readall(inputStream, buffer, 2); //put two bytes in buffer
-                        int16value = 256 * (int) buffer[1] + (int) buffer[0];
-                        textWin.append(int16value + "\n");        //write to terminal
-                        break;
-                    }
+
+                    // Display results
+                    textWin.append(new String(chunk).replace("\r\n", "\n"));
+
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
+
                 //scroll terminal to bottom
                 textWin.setCaretPosition(textWin.getText().length());
                 break;
         }
-    }
-
-    //fill buffer with numBytes bytes from is
-    public void readall(InputStream is, byte[] buffer, int numBytes) {
-        int tempRead = 0;
-        while (tempRead < numBytes) {
-            try {
-                tempRead = tempRead + is.read(buffer, tempRead, numBytes - tempRead);
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        }
-        return;
-    }
+    }   
 
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -632,12 +606,6 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
     static final int KB = 1024;
     public static ArrayBlockingQueue<Character> sharedBuffer = new ArrayBlockingQueue<Character>(10 * KB, true);
     public static boolean firmwareUpload = false;
-
-    public enum RxFormat {
-
-        ASCII, INT16;
-    }
-    private RxFormat displayFormat;
     //constants
     static final int MAX_PORTS = 20;    //maximum number of ports to look for
     static final int MAX_DATA = 64;//maximum length of serial data received    
