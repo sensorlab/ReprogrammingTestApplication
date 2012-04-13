@@ -18,7 +18,7 @@ import javax.swing.JTextArea;
 public class FileInPackets implements Runnable {
 
     private static final int PACKET_SIZE = 512;
-    private static final int SECOND = 1000;
+    private static final int TIMEOUT = 30000; // transmission timeout in ms
     private static final String CR_LF = "\r\n";
     private File otaImage;
     private long otaImageSize;
@@ -166,7 +166,7 @@ public class FileInPackets implements Runnable {
                     retransmissionCounter++;
                     i--;
                     noResponse = false;
-                } else if ((stop - start) > 30 * SECOND) {
+                } else if ((stop - start) > TIMEOUT) {
                     try {
                         for (int j = 0; j < 5; j++) {
                             outputStream.write(CR_LF.getBytes());

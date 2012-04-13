@@ -612,7 +612,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
     private JFileChooser fc;
     private File file;
     private FileInPackets firmware;
-    static final int KB = 1024;
+    private static final int KB = 1024;
     //public static ArrayBlockingQueue<Character> sharedBuffer = new ArrayBlockingQueue<Character>(10 * KB, true);
     public static boolean firmwareUpload = false;
     //constants
