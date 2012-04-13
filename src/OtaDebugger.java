@@ -420,7 +420,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
     }//GEN-LAST:event_portBoxActionPerformed
 
     private void textbarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textbarActionPerformed
-        //if (!firmwareUpload) {
+        if (!firmwareUpload) {
             String text = textbar.getText();    //get text from field
             textWin.append("<<" + text + "\n");   //write text to terminal followed by new line
             textbar.selectAll();                //highlight text so it can be easily overwritten
@@ -433,9 +433,9 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
                     ex.printStackTrace();
                 }
             }
-        //} else {
-          //  textWin.append("##User error: Firmware being uploaded!\n");
-        //}
+        } else {
+            textWin.append("##User error: Firmware being uploaded!\n");
+        }
     }//GEN-LAST:event_textbarActionPerformed
 
     private void baudFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_baudFieldActionPerformed
