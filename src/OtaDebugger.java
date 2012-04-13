@@ -275,7 +275,8 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
                 .add(23, 23, 23))
         );
 
-        pack();
+        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        setBounds((screenSize.width-489)/2, (screenSize.height-656)/2, 489, 656);
     }// </editor-fold>//GEN-END:initComponents
 
     private void SendButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SendButtonActionPerformed
