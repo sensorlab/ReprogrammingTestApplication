@@ -43,11 +43,7 @@ public class FileInPackets implements Runnable {
 
     public void bufferAddChar(Character ch) {
         inputBuffer.add(ch);
-    }
-
-    public void bufferClear() {
-        inputBuffer.clear();
-    }
+    }    
 
     public ArrayList<byte[]> getOtaPackets() {
         ArrayList<byte[]> otaPackets = new ArrayList<byte[]>();
