@@ -26,7 +26,7 @@ public class FileInPackets implements Runnable {
     private OutputStream outputStream;
     private JTextArea textWin;
     private String uri;
-    private LinkedBlockingQueue<Character> inputBuffer;
+    private String recievedString;
     private boolean uploadingFirmware = false;
     private boolean breakTransmission = false;
 
@@ -38,8 +38,7 @@ public class FileInPackets implements Runnable {
         this.outputStream = outputStream;
         this.textWin = textWin;
         this.uri = uri;
-
-        inputBuffer = new LinkedBlockingQueue<Character>();
+        recievedString = "";
     }
 
     public boolean getBreakTransmission() {
@@ -54,8 +53,8 @@ public class FileInPackets implements Runnable {
         return uploadingFirmware;
     }
 
-    public void bufferAddChar(Character ch) {
-        inputBuffer.add(ch);
+    public void bufferAddChunk(byte[] chunk) {
+        recievedString += new String(chunk);
     }
 
     public ArrayList<byte[]> getOtaPackets() {
@@ -131,7 +130,6 @@ public class FileInPackets implements Runnable {
                 break;
             }
 
-            inputBuffer.clear();
             byte[] packet = packets.get(i);
             sendRequest(packet, i);
 
@@ -140,57 +138,48 @@ public class FileInPackets implements Runnable {
             while (noResponse && !breakTransmission) {
                 long stop = System.currentTimeMillis();
 
-                String recievedStr = "";
-                if (inputBuffer != null) {
-                    int len = inputBuffer.size();
-                    for (int j = 0; j < len; j++) {
-                        if (inputBuffer.peek() != null) {
-                            recievedStr += inputBuffer.poll();
-                        }
-                    }
-                }
-
-                if (recievedStr.contains("OK" + CR_LF) && !recievedStr.contains("CORRUPTED-DATA") && !recievedStr.contains("JUNK-INPUT")) {
+                if (recievedString.contains("OK" + CR_LF) && !recievedString.contains("CORRUPTED-DATA") && !recievedString.contains("JUNK-INPUT")) {
                     transmissionCounter = i;
                     retransmissionCounter = 0;
+                    recievedString = "";
                     noResponse = false;
-                } else if (recievedStr.contains("ERROR" + CR_LF + CR_LF + "OK" + CR_LF)) {
+                } else if (recievedString.contains("ERROR" + CR_LF + CR_LF + "OK" + CR_LF)) {
                     outputText("##Error - APPLICATION-ERROR -> retransmitting packet: " + i + "\n");
                     retransmissionCounter++;
                     i--;
+                    recievedString = "";
                     noResponse = false;
-                } else if (recievedStr.contains("CORRUPTED-DATA" + CR_LF + CR_LF + "OK" + CR_LF)) {
+                } else if (recievedString.contains("CORRUPTED-DATA" + CR_LF + CR_LF + "OK" + CR_LF)) {
                     outputText("##Error - CORRUPTED-DATA -> retransmitting packet: " + i + "\n");
                     retransmissionCounter++;
                     i--;
+                    recievedString = "";
                     noResponse = false;
-                } else if (recievedStr.contains("JUNK-INPUT" + CR_LF + CR_LF + "OK" + CR_LF)) {
+                } else if (recievedString.contains("JUNK-INPUT" + CR_LF + CR_LF + "OK" + CR_LF)) {
                     try {
-                        for (int j = 0; j < 5; j++) {
-                            outputStream.write(CR_LF.getBytes());
-                        }
+                        outputStream.write("\r\n\r\n\r\n\r\n\r\n".getBytes());
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
                     outputText("##Error - JUNK-INPUT -> retransmitting packet: " + i + "\n");
                     retransmissionCounter++;
                     i--;
+                    recievedString = "";
                     noResponse = false;
                 } else if ((stop - start) > TIMEOUT) {
                     try {
-                        for (int j = 0; j < 5; j++) {
-                            outputStream.write(CR_LF.getBytes());
-                        }
+                        outputStream.write("\r\n\r\n\r\n\r\n\r\n".getBytes());
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
                     outputText("##Timeout, retransmitting packet: " + i + "\n");
                     retransmissionCounter++;
                     i--;
+                    recievedString = "";
                     noResponse = false;
                 }
                 try {
-                    Thread.sleep(10);
+                    Thread.sleep(1);
                 } catch (InterruptedException ex) {
                     ex.printStackTrace();
                 }
@@ -201,7 +190,6 @@ public class FileInPackets implements Runnable {
         } else {
             outputText("##Fatal error transmitting firmware.\n");
         }
-        inputBuffer.clear();
         uploadingFirmware = false;
     }
 

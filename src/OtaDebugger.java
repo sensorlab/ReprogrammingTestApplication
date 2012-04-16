@@ -548,28 +548,16 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
     //display the data on the terminal
     @Override
     public void serialEvent(SerialPortEvent event) {
-        switch (event.getEventType()) {
-            case SerialPortEvent.DATA_AVAILABLE:
+        try {   //read the input stream and store to buffer, count number of bytes read
+            int available = inputStream.available();
+            byte chunk[] = new byte[available];
+            inputStream.read(chunk, 0, available);
+            firmware.bufferAddChunk(chunk);
 
-                try {   //read the input stream and store to buffer, count number of bytes read
-                    int available = inputStream.available();
-                    byte chunk[] = new byte[available];
-                    inputStream.read(chunk, 0, available);
-
-                    if (firmware != null && firmware.getUploadingFirmware()) {
-                        //add character to buffer                            
-                        for (int i = 0; i < available; i++) {
-                            firmware.bufferAddChar((char) chunk[i]);
-                        }
-                    }
-
-                    // Display results
-                    outputText(new String(chunk).replace("\r\n", "\n"));
-
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-                break;
+            // Display results
+            outputText(new String(chunk).replace("\r\n", "\n"));
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 
