@@ -35,7 +35,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
         getPorts();
         initComponents();
         //Display some instructions upon opening
-        textWin.append("##Select Port, Specify Baud Rate (default " + baudRate + "), Open Port.\n");
+        outputText("##Select Port, Specify Baud Rate (default " + baudRate + "), Open Port.\n");
         //Create a file chooser
         fc = new JFileChooser();
     }
@@ -311,12 +311,12 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
             serialPort.removeEventListener();
             if (serialPort != null) {
                 serialPort.close();
-            }            
+            }
             open = false;
-            if(firmware != null) {
+            if (firmware != null) {
                 firmware.setBreakTransmission(true);
             }
-            textWin.append("##Port " + portName + " is now closed.\n");
+            outputText("##Port " + portName + " is now closed.\n");
         }
     }//GEN-LAST:event_formWindowClosing
 
@@ -324,25 +324,25 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
         //only change baud when port is closed
         boolean reopen = false;
         if (portIdentifier.isCurrentlyOwned()) {//if port open, prompt user to close
-            textWin.append("##Closing Port " + portName + ".\n");
+            outputText("##Closing Port " + portName + ".\n");
             reopen = true;
             //JOptionPane.showMessageDialog(this, "Must Close Port First.", "Error", JOptionPane.ERROR_MESSAGE);
         }
         String newbaud = baudField.getText();//get text from user
         //do simple check to make sure baudrate is valid
         if (newbaud.equals("")) {
-            textWin.append("##Must Enter Valid Baud Rate.\n");
+            outputText("##Must Enter Valid Baud Rate.\n");
             //JOptionPane.showMessageDialog(this, "Must Enter Valid Baud Rate.");
         } else {//convert string to int. when user re-opens port, it will be new baudrate
             baudRate = Integer.valueOf(newbaud).intValue();
-            textWin.append("##Baud rate changed to " + baudRate + ".\n");
+            outputText("##Baud rate changed to " + baudRate + ".\n");
             if (reopen == true) {
                 try {
                     connect(portName);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                textWin.append("##Opening Port: " + portName + ", Baud Rate: " + baudRate + ".\n");
+                outputText("##Opening Port: " + portName + ", Baud Rate: " + baudRate + ".\n");
             }
         }
     }//GEN-LAST:event_baudButtonActionPerformed
@@ -351,7 +351,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
         //only open valid port. portList[0]="select port" - not a valid port
         //if ((String)portBox.getSelectedItem() == portList[0]) {
         if (portBox.getSelectedItem().equals(portList[0])) {
-            textWin.append("##Must Select Valid Port.\n");
+            outputText("##Must Select Valid Port.\n");
             portToggle.setSelected(open);
             //JOptionPane.showMessageDialog(this, "Must Select Valid Port.", "Error", JOptionPane.ERROR_MESSAGE);
         } //if port open, close port & I/O streams
@@ -380,14 +380,14 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
             }
 
             open = false;
-            if(firmware != null) {
+            if (firmware != null) {
                 firmware.setBreakTransmission(true);
             }
-            textWin.append("##Port " + portName + " is now closed.\n");
+            outputText("##Port " + portName + " is now closed.\n");
         } else {//else port is closed, so open it
             portToggle.setText("Close Port");
             portName = (String) portBox.getSelectedItem();
-            textWin.append("##Opening Port: " + portName + ", Baud Rate: " + baudRate + ".\n");
+            outputText("##Opening Port: " + portName + ", Baud Rate: " + baudRate + ".\n");
             try {
                 connect(portName);
             } catch (Exception e) {
@@ -399,7 +399,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
                 ex.printStackTrace();
             }
             serialPort.notifyOnDataAvailable(true);
-            textWin.append("##Port opened.\n");
+            outputText("##Port opened.\n");
         }
     }//GEN-LAST:event_portToggleActionPerformed
 
@@ -408,7 +408,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
         //make sure port is not currently in use
         portIdentifier = CommPortIdentifier.getPortIdentifier(portName);
         if (portIdentifier.isCurrentlyOwned()) {
-            textWin.append("##Error: Port is currently in use");
+            outputText("##Error: Port is currently in use");
         } else {
             //create CommPort and identify available serial/parallel ports
             commPort = portIdentifier.open(this.getClass().getName(), 2000);
@@ -419,7 +419,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
             inputStream = serialPort.getInputStream();
             outputStream = serialPort.getOutputStream();
             open = true;
-            if(firmware != null) {
+            if (firmware != null) {
                 firmware.setBreakTransmission(false);
             }
         }
@@ -427,18 +427,18 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
 
     private void portBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_portBoxActionPerformed
         if (open == true) { //if port open, make user close port before changing port
-            textWin.append("##Must Close Port Before Changing Port.\n");
+            outputText("##Must Close Port Before Changing Port.\n");
             //JOptionPane.showMessageDialog(this, "Must Close Port Before Changing Port.");
         } else {
             portName = (String) portBox.getSelectedItem();
-            textWin.append("##Port Selected: " + portName + ", Baud Rate: " + baudRate + ".\n");
+            outputText("##Port Selected: " + portName + ", Baud Rate: " + baudRate + ".\n");
         }
     }//GEN-LAST:event_portBoxActionPerformed
 
     private void textbarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textbarActionPerformed
         if (firmware == null || !firmware.getUploadingFirmware()) {
             String text = textbar.getText();    //get text from field
-            textWin.append("<<" + text + "\n");   //write text to terminal followed by new line
+            outputText("<<" + text + "\n");   //write text to terminal followed by new line
             textbar.selectAll();                //highlight text so it can be easily overwritten
             //if serial port open, write to serial port
             if (open == true) {
@@ -450,7 +450,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
                 }
             }
         } else {
-            textWin.append("##User error: Firmware being uploaded!\n");
+            outputText("##User error: Firmware being uploaded!\n");
         }
     }//GEN-LAST:event_textbarActionPerformed
 
@@ -467,13 +467,13 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
                     firmware = new FileInPackets(file, inputStream, outputStream, textWin, uriTextField.getText());
                     new Thread(firmware).start();
                 } else {
-                    textWin.append("##No file selected.\n");
+                    outputText("##No file selected.\n");
                 }
             } else {
-                textWin.append("##Serial port is not opened.\n");
+                outputText("##Serial port is not opened.\n");
             }
         } else {
-            textWin.append("##Firmware upload already in progress.\n");
+            outputText("##Firmware upload already in progress.\n");
         }
     }//GEN-LAST:event_uploadButtonActionPerformed
 
@@ -517,8 +517,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
      * private void listPorts() { //display available ports to the terminal
      * Enumeration portEnum = CommPortIdentifier.getPortIdentifiers(); while (
      * portEnum.hasMoreElements() ) { portIdentifier = (CommPortIdentifier)
-     * portEnum.nextElement(); textWin.append(portIdentifier.getName() + "\n");
-     * } }
+     * portEnum.nextElement(); outputText(portIdentifier.getName() + "\n"); } }
      */
     //run before initializing GUI
     //creates a string array of all the ports
@@ -541,7 +540,12 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
         for (i = 0; i < numports; i++) {
             portList[i] = tempPortList[i];
         }
-    }    
+    }
+
+    private void outputText(String str) {
+        textWin.append(str);
+        textWin.setCaretPosition(textWin.getText().length());
+    }
 
     //serial event: when data is received from serial port
     //display the data on the terminal
@@ -563,14 +567,11 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
                     }
 
                     // Display results
-                    textWin.append(new String(chunk).replace("\r\n", "\n"));
+                    outputText(new String(chunk).replace("\r\n", "\n"));
 
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
-
-                //scroll terminal to bottom
-                textWin.setCaretPosition(textWin.getText().length());
                 break;
         }
     }
@@ -618,8 +619,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
     private static boolean open = false;
     private JFileChooser fc;
     private File file;
-    private FileInPackets firmware;    
-    
+    private FileInPackets firmware;
     //constants
     static final int MAX_PORTS = 20;    //maximum number of ports to look for
     static final int MAX_DATA = 64;//maximum length of serial data received    

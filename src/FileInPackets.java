@@ -28,7 +28,7 @@ public class FileInPackets implements Runnable {
     private String uri;
     private LinkedBlockingQueue<Character> inputBuffer;
     private boolean uploadingFirmware = false;
-    private boolean breakTransmission = false;    
+    private boolean breakTransmission = false;
 
     public FileInPackets(File otaImage, InputStream inputStream,
             OutputStream outputStream, JTextArea textWin, String uri) {
@@ -39,9 +39,9 @@ public class FileInPackets implements Runnable {
         this.textWin = textWin;
         this.uri = uri;
 
-        inputBuffer = new LinkedBlockingQueue<Character>();       
+        inputBuffer = new LinkedBlockingQueue<Character>();
     }
-    
+
     public boolean getBreakTransmission() {
         return breakTransmission;
     }
@@ -49,14 +49,14 @@ public class FileInPackets implements Runnable {
     public void setBreakTransmission(boolean breakTransmission) {
         this.breakTransmission = breakTransmission;
     }
-    
+
     public boolean getUploadingFirmware() {
         return uploadingFirmware;
     }
 
     public void bufferAddChar(Character ch) {
         inputBuffer.add(ch);
-    }    
+    }
 
     public ArrayList<byte[]> getOtaPackets() {
         ArrayList<byte[]> otaPackets = new ArrayList<byte[]>();
@@ -121,6 +121,7 @@ public class FileInPackets implements Runnable {
     }
 
     public synchronized void sendPackets() {
+        uploadingFirmware = true;
         ArrayList<byte[]> packets = getOtaPackets();
 
         int transmissionCounter = 0;
@@ -154,12 +155,12 @@ public class FileInPackets implements Runnable {
                     retransmissionCounter = 0;
                     noResponse = false;
                 } else if (recievedStr.contains("ERROR" + CR_LF + CR_LF + "OK" + CR_LF)) {
-                    textWin.append("##Error - APPLICATION-ERROR -> retransmitting packet: " + i + "\n");
+                    outputText("##Error - APPLICATION-ERROR -> retransmitting packet: " + i + "\n");
                     retransmissionCounter++;
                     i--;
                     noResponse = false;
                 } else if (recievedStr.contains("CORRUPTED-DATA" + CR_LF + CR_LF + "OK" + CR_LF)) {
-                    textWin.append("##Error - CORRUPTED-DATA -> retransmitting packet: " + i + "\n");
+                    outputText("##Error - CORRUPTED-DATA -> retransmitting packet: " + i + "\n");
                     retransmissionCounter++;
                     i--;
                     noResponse = false;
@@ -171,7 +172,7 @@ public class FileInPackets implements Runnable {
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
-                    textWin.append("##Error - JUNK-INPUT -> retransmitting packet: " + i + "\n");
+                    outputText("##Error - JUNK-INPUT -> retransmitting packet: " + i + "\n");
                     retransmissionCounter++;
                     i--;
                     noResponse = false;
@@ -183,7 +184,7 @@ public class FileInPackets implements Runnable {
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
-                    textWin.append("##Timeout, retransmitting packet: " + i + "\n");
+                    outputText("##Timeout, retransmitting packet: " + i + "\n");
                     retransmissionCounter++;
                     i--;
                     noResponse = false;
@@ -196,11 +197,12 @@ public class FileInPackets implements Runnable {
             }
         }
         if (transmissionCounter == packets.size() - 1) {
-            textWin.append("##Firmware successfully uploaded.\n");
+            outputText("##Firmware successfully uploaded.\n");
         } else {
-            textWin.append("##Fatal error transmitting firmware.\n");
+            outputText("##Fatal error transmitting firmware.\n");
         }
         inputBuffer.clear();
+        uploadingFirmware = false;
     }
 
     public long calculateCrc(byte[] otaPacket) {
@@ -230,24 +232,27 @@ public class FileInPackets implements Runnable {
         try {
             if (outputStream != null) {
                 outputStream.write(req.getBytes());
-                textWin.append("\n<<" + req);
+                outputText("\n<<" + req);
                 outputStream.write(len.getBytes());
-                textWin.append("<<" + len);
+                outputText("<<" + len);
                 outputStream.write(packet);
                 outputStream.write(CR_LF.getBytes());
-                textWin.append("##" + "Packet number: " + packetNum + "\n");
+                outputText("##" + "Packet number: " + packetNum + "\n");
                 outputStream.write(strCrc.getBytes());
-                textWin.append("<<" + strCrc + "\n");
+                outputText("<<" + strCrc + "\n");
             }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
+    private void outputText(String str) {
+        textWin.append(str);
+        textWin.setCaretPosition(textWin.getText().length());
+    }
+
     @Override
     public void run() {
-        uploadingFirmware = true;
         sendPackets();
-        uploadingFirmware = false;
     }
 }
