@@ -53,7 +53,7 @@
                               <Component id="baudField" min="-2" pref="56" max="-2" attributes="1"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="baudButton" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                              <EmptySpace min="0" pref="226" max="32767" attributes="0"/>
                           </Group>
                           <Component id="textbar" max="32767" attributes="1"/>
                       </Group>

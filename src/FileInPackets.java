@@ -27,6 +27,8 @@ public class FileInPackets implements Runnable {
     private JTextArea textWin;
     private String uri;
     private LinkedBlockingQueue<Character> inputBuffer;
+    private boolean uploadingFirmware = false;
+    private boolean breakTransmission = false;    
 
     public FileInPackets(File otaImage, InputStream inputStream,
             OutputStream outputStream, JTextArea textWin, String uri) {
@@ -37,8 +39,19 @@ public class FileInPackets implements Runnable {
         this.textWin = textWin;
         this.uri = uri;
 
-        inputBuffer = new LinkedBlockingQueue<Character>();
-        OtaDebugger.firmwareUpload = true;
+        inputBuffer = new LinkedBlockingQueue<Character>();       
+    }
+    
+    public boolean getBreakTransmission() {
+        return breakTransmission;
+    }
+
+    public void setBreakTransmission(boolean breakTransmission) {
+        this.breakTransmission = breakTransmission;
+    }
+    
+    public boolean getUploadingFirmware() {
+        return uploadingFirmware;
     }
 
     public void bufferAddChar(Character ch) {
@@ -113,7 +126,7 @@ public class FileInPackets implements Runnable {
         int transmissionCounter = 0;
         int retransmissionCounter = 0;
         for (int i = 0; i < packets.size(); i++) {
-            if (retransmissionCounter >= 10 || !OtaDebugger.open) {
+            if (retransmissionCounter >= 10 || breakTransmission) {
                 break;
             }
 
@@ -123,7 +136,7 @@ public class FileInPackets implements Runnable {
 
             boolean noResponse = true;
             long start = System.currentTimeMillis();
-            while (noResponse && OtaDebugger.open) {
+            while (noResponse && !breakTransmission) {
                 long stop = System.currentTimeMillis();
 
                 String recievedStr = "";
@@ -186,8 +199,7 @@ public class FileInPackets implements Runnable {
             textWin.append("##Firmware successfully uploaded.\n");
         } else {
             textWin.append("##Fatal error transmitting firmware.\n");
-        }        
-        OtaDebugger.firmwareUpload = false;
+        }
         inputBuffer.clear();
     }
 
@@ -234,6 +246,8 @@ public class FileInPackets implements Runnable {
 
     @Override
     public void run() {
+        uploadingFirmware = true;
         sendPackets();
+        uploadingFirmware = false;
     }
 }

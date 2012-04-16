@@ -311,8 +311,11 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
             serialPort.removeEventListener();
             if (serialPort != null) {
                 serialPort.close();
-            }
+            }            
             open = false;
+            if(firmware != null) {
+                firmware.setBreakTransmission(true);
+            }
             textWin.append("##Port " + portName + " is now closed.\n");
         }
     }//GEN-LAST:event_formWindowClosing
@@ -377,6 +380,9 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
             }
 
             open = false;
+            if(firmware != null) {
+                firmware.setBreakTransmission(true);
+            }
             textWin.append("##Port " + portName + " is now closed.\n");
         } else {//else port is closed, so open it
             portToggle.setText("Close Port");
@@ -413,6 +419,9 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
             inputStream = serialPort.getInputStream();
             outputStream = serialPort.getOutputStream();
             open = true;
+            if(firmware != null) {
+                firmware.setBreakTransmission(false);
+            }
         }
     }
 
@@ -427,7 +436,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
     }//GEN-LAST:event_portBoxActionPerformed
 
     private void textbarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textbarActionPerformed
-        if (!firmwareUpload) {
+        if (firmware == null || !firmware.getUploadingFirmware()) {
             String text = textbar.getText();    //get text from field
             textWin.append("<<" + text + "\n");   //write text to terminal followed by new line
             textbar.selectAll();                //highlight text so it can be easily overwritten
@@ -451,7 +460,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
     }//GEN-LAST:event_baudFieldActionPerformed
 
     private void uploadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uploadButtonActionPerformed
-        if (!firmwareUpload) {
+        if (firmware == null || !firmware.getUploadingFirmware()) {
             if (open) {
                 if (file != null && uriTextField != null) {
                     clearButtonActionPerformed(evt);
@@ -532,7 +541,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
         for (i = 0; i < numports; i++) {
             portList[i] = tempPortList[i];
         }
-    }
+    }    
 
     //serial event: when data is received from serial port
     //display the data on the terminal
@@ -546,7 +555,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
                     byte chunk[] = new byte[available];
                     inputStream.read(chunk, 0, available);
 
-                    if (firmwareUpload) {
+                    if (firmware != null && firmware.getUploadingFirmware()) {
                         //add character to buffer                            
                         for (int i = 0; i < available; i++) {
                             firmware.bufferAddChar((char) chunk[i]);
@@ -606,13 +615,11 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
     private InputStream inputStream;
     private OutputStream outputStream;
     private int baudRate = 115200;
-    public static boolean open = false;
+    private static boolean open = false;
     private JFileChooser fc;
     private File file;
-    private FileInPackets firmware;
-    private static final int KB = 1024;
-    //public static ArrayBlockingQueue<Character> sharedBuffer = new ArrayBlockingQueue<Character>(10 * KB, true);
-    public static boolean firmwareUpload = false;
+    private FileInPackets firmware;    
+    
     //constants
     static final int MAX_PORTS = 20;    //maximum number of ports to look for
     static final int MAX_DATA = 64;//maximum length of serial data received    
