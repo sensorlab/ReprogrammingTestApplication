@@ -36,6 +36,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
         initComponents();
         //Display some instructions upon opening
         outputText("##Select Port, Specify Baud Rate (default " + baudRate + "), Open Port.\n");
+        firmware = new FileInPackets();
         //Create a file chooser
         fc = new JFileChooser();
     }
@@ -310,9 +311,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
                 serialPort.close();
             }
             open = false;
-            if (firmware != null) {
-                firmware.setBreakTransmission(true);
-            }
+            firmware.setBreakTransmission(true);
             outputText("##Port " + portName + " is now closed.\n");
         }
     }//GEN-LAST:event_formWindowClosing
@@ -377,9 +376,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
             }
 
             open = false;
-            if (firmware != null) {
-                firmware.setBreakTransmission(true);
-            }
+            firmware.setBreakTransmission(true);
             outputText("##Port " + portName + " is now closed.\n");
         } else {//else port is closed, so open it
             portToggle.setText("Close Port");
@@ -416,9 +413,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
             inputStream = serialPort.getInputStream();
             outputStream = serialPort.getOutputStream();
             open = true;
-            if (firmware != null) {
-                firmware.setBreakTransmission(false);
-            }
+            firmware.setBreakTransmission(false);
         }
     }
 
@@ -433,7 +428,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
     }//GEN-LAST:event_portBoxActionPerformed
 
     private void textbarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textbarActionPerformed
-        if (firmware == null || !firmware.getUploadingFirmware()) {
+        if (!firmware.getUploadingFirmware()) {        
             String text = textbar.getText();    //get text from field
             outputText("<<" + text + "\n");   //write text to terminal followed by new line
             textbar.selectAll();                //highlight text so it can be easily overwritten
@@ -457,11 +452,11 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
     }//GEN-LAST:event_baudFieldActionPerformed
 
     private void uploadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uploadButtonActionPerformed
-        if (firmware == null || !firmware.getUploadingFirmware()) {
+        if (!firmware.getUploadingFirmware()) {
             if (open) {
                 if (file != null && uriTextField != null) {
                     clearButtonActionPerformed(evt);
-                    firmware = new FileInPackets(file, inputStream, outputStream, textWin, uriTextField.getText());
+                    firmware.initializeFirmwareUpload(file, inputStream, outputStream, textWin, uriTextField.getText());
                     new Thread(firmware).start();
                 } else {
                     outputText("##No file selected.\n");
@@ -552,7 +547,9 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
             int available = inputStream.available();
             byte chunk[] = new byte[available];
             inputStream.read(chunk, 0, available);
-            firmware.bufferAddChunk(chunk);
+            if (firmware.getUploadingFirmware()) {
+                firmware.bufferAddChunk(chunk);
+            }
 
             // Display results
             outputText(new String(chunk).replace("\r\n", "\n"));

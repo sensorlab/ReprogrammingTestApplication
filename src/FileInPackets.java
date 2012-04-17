@@ -6,7 +6,6 @@
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 import javax.swing.JTextArea;
@@ -30,7 +29,10 @@ public class FileInPackets implements Runnable {
     private boolean uploadingFirmware = false;
     private boolean breakTransmission = false;
 
-    public FileInPackets(File otaImage, InputStream inputStream,
+    public FileInPackets() {
+    }
+
+    public void initializeFirmwareUpload(File otaImage, InputStream inputStream,
             OutputStream outputStream, JTextArea textWin, String uri) {
         this.otaImage = otaImage;
         otaImageSize = otaImage.length();
@@ -39,6 +41,7 @@ public class FileInPackets implements Runnable {
         this.textWin = textWin;
         this.uri = uri;
         recievedString = "";
+
     }
 
     public boolean getBreakTransmission() {
@@ -156,22 +159,14 @@ public class FileInPackets implements Runnable {
                     recievedString = "";
                     noResponse = false;
                 } else if (recievedString.contains("JUNK-INPUT" + CR_LF + CR_LF + "OK" + CR_LF)) {
-                    try {
-                        outputStream.write("\r\n\r\n\r\n\r\n\r\n".getBytes());
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
+                    recoveryRequest();
                     outputText("##Error - JUNK-INPUT -> retransmitting packet: " + i + "\n");
                     retransmissionCounter++;
                     i--;
                     recievedString = "";
                     noResponse = false;
                 } else if ((stop - start) > TIMEOUT) {
-                    try {
-                        outputStream.write("\r\n\r\n\r\n\r\n\r\n".getBytes());
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
+                    recoveryRequest();
                     outputText("##Timeout, retransmitting packet: " + i + "\n");
                     retransmissionCounter++;
                     i--;
@@ -191,6 +186,7 @@ public class FileInPackets implements Runnable {
             outputText("##Fatal error transmitting firmware.\n");
         }
         uploadingFirmware = false;
+        recievedString = "";
     }
 
     public long calculateCrc(byte[] otaPacket) {
@@ -220,18 +216,32 @@ public class FileInPackets implements Runnable {
         try {
             if (outputStream != null) {
                 outputStream.write(req.getBytes());
-                outputText("\n<<" + req);
                 outputStream.write(len.getBytes());
-                outputText("<<" + len);
                 outputStream.write(packet);
                 outputStream.write(CR_LF.getBytes());
-                outputText("##" + "Packet number: " + packetNum + "\n");
                 outputStream.write(strCrc.getBytes());
+                outputText("\n<<" + req);
+                outputText("<<" + len);
+                outputText("##" + "Packet number: " + packetNum + "\n");
                 outputText("<<" + strCrc + "\n");
             }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    private void recoveryRequest() {
+        try {
+            recievedString = "";
+            outputStream.write("\r\n\r\n\r\n\r\n\r\n".getBytes());
+            while (!recievedString.contains("OK" + CR_LF)) {
+                Thread.sleep(1);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+
     }
 
     private void outputText(String str) {
