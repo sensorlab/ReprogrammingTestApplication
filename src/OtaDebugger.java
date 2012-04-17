@@ -428,7 +428,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
     }//GEN-LAST:event_portBoxActionPerformed
 
     private void textbarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textbarActionPerformed
-        if (!firmware.getUploadingFirmware()) {        
+        if (!firmware.getUploadingFirmware()) {
             String text = textbar.getText();    //get text from field
             outputText("<<" + text + "\n");   //write text to terminal followed by new line
             textbar.selectAll();                //highlight text so it can be easily overwritten
@@ -455,9 +455,13 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
         if (!firmware.getUploadingFirmware()) {
             if (open) {
                 if (file != null && uriTextField != null) {
-                    clearButtonActionPerformed(evt);
-                    firmware.initializeFirmwareUpload(file, inputStream, outputStream, textWin, uriTextField.getText());
-                    new Thread(firmware).start();
+                    if (!uriTextField.getText().equals("")) {
+                        clearButtonActionPerformed(evt);
+                        firmware.initializeFirmwareUpload(file, inputStream, outputStream, textWin, uriTextField.getText());
+                        new Thread(firmware).start();
+                    } else {
+                        outputText("##No URI defined.\n");
+                    }
                 } else {
                     outputText("##No file selected.\n");
                 }
@@ -474,25 +478,33 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
         file = fc.getSelectedFile();
 
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            firmwareTextField.setText(file.getAbsolutePath());
-
-            try {
-                FileInputStream fin = new FileInputStream(file);
+            if (file.length() < MB) {
+                firmwareTextField.setText(file.getAbsolutePath());
                 try {
-                    Checksum checksum = new CRC32();
-                    int b = 0;
-                    while ((b = fin.read()) != -1) {
-                        checksum.update(b);
+                    FileInputStream fin = new FileInputStream(file);
+                    try {
+                        Checksum checksum = new CRC32();
+                        int b = 0;
+                        while ((b = fin.read()) != -1) {
+                            checksum.update(b);
+                        }
+                        firmwareSizeNumLabel.setText(Long.toString(file.length()));
+                        crcNumLabel.setText(Long.toString(checksum.getValue()));
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    } finally {
+                        fin.close();
                     }
-                    firmwareSizeNumLabel.setText(Long.toString(file.length()));
-                    crcNumLabel.setText(Long.toString(checksum.getValue()));
-                } catch (IOException ex) {
+                } catch (Exception ex) {
                     ex.printStackTrace();
-                } finally {
-                    fin.close();
                 }
-            } catch (Exception ex) {
-                ex.printStackTrace();
+            } else {
+                outputText("##Selected file size is too large.\n");
+                outputText("##The maximum allowed size is one MB.\n");
+                firmwareTextField.setText("");
+                firmwareSizeNumLabel.setText("");
+                crcNumLabel.setText("");
+                file = null;
             }
         } else {
             firmwareTextField.setText("");
@@ -500,6 +512,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
             crcNumLabel.setText("");
             file = null;
         }
+
     }//GEN-LAST:event_browseButtonActionPerformed
 
     private void uriTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uriTextFieldActionPerformed
@@ -604,5 +617,6 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
     private FileInPackets firmware;
     //constants
     static final int MAX_PORTS = 20;    //maximum number of ports to look for
-    static final int MAX_DATA = 64;//maximum length of serial data received    
+    static final int MAX_DATA = 64;     //maximum length of serial data received
+    static final long MB = 1048576;     //one Megabyte in Bytes
 }
