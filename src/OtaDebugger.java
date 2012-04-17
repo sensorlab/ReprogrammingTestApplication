@@ -82,6 +82,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("VESNA Remote Debugger");
+        setMinimumSize(new java.awt.Dimension(350, 400));
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
