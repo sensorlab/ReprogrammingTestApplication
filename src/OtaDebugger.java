@@ -476,9 +476,9 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
 
     private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
         int returnVal = fc.showOpenDialog(OtaDebugger.this);
-        file = fc.getSelectedFile();
 
         if (returnVal == JFileChooser.APPROVE_OPTION) {
+            file = fc.getSelectedFile();
             if (file.length() < MB) {
                 firmwareTextField.setText(file.getAbsolutePath());
                 try {
@@ -507,13 +507,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
                 crcNumLabel.setText("  ");
                 file = null;
             }
-        } else {
-            firmwareTextField.setText("");
-            firmwareSizeNumLabel.setText("  ");
-            crcNumLabel.setText("  ");
-            file = null;
         }
-
     }//GEN-LAST:event_browseButtonActionPerformed
 
     private void uriTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uriTextFieldActionPerformed
