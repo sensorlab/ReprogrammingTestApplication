@@ -502,14 +502,14 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
                 outputText("##Selected file size is too large.\n");
                 outputText("##The maximum allowed size is one MB.\n");
                 firmwareTextField.setText("");
-                firmwareSizeNumLabel.setText("");
-                crcNumLabel.setText("");
+                firmwareSizeNumLabel.setText("  ");
+                crcNumLabel.setText("  ");
                 file = null;
             }
         } else {
             firmwareTextField.setText("");
-            firmwareSizeNumLabel.setText("");
-            crcNumLabel.setText("");
+            firmwareSizeNumLabel.setText("  ");
+            crcNumLabel.setText("  ");
             file = null;
         }
 
