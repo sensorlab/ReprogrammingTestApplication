@@ -1,8 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+package org.ijs.vesna.debugger;
 
+/*
+ * To change this template, choose Tools | Templates and open the template in
+ * the editor.
+ */
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -25,9 +26,10 @@ public class FileInPackets implements Runnable {
     private OutputStream outputStream;
     private JTextArea textWin;
     private String uri;
-    private String recievedString;
+    //private String recievedString;
     private boolean uploadingFirmware = false;
     private boolean breakTransmission = false;
+    private Comunicator client;
 
     public FileInPackets() {
     }
@@ -40,7 +42,8 @@ public class FileInPackets implements Runnable {
         this.outputStream = outputStream;
         this.textWin = textWin;
         this.uri = uri;
-        recievedString = "";
+        //recievedString = "";
+        client = new Comunicator(inputStream, outputStream);
 
     }
 
@@ -57,7 +60,7 @@ public class FileInPackets implements Runnable {
     }
 
     public void bufferAddChunk(byte[] chunk) {
-        recievedString += new String(chunk);
+        //recievedString += new String(chunk);
     }
 
     public ArrayList<byte[]> getOtaPackets() {
@@ -124,69 +127,85 @@ public class FileInPackets implements Runnable {
 
     public synchronized void sendPackets() {
         uploadingFirmware = true;
-        ArrayList<byte[]> packets = getOtaPackets();
+        try {
+            ArrayList<byte[]> packets = getOtaPackets();
 
-        int transmissionCounter = 0;
-        int retransmissionCounter = 0;
-        for (int i = 0; i < packets.size(); i++) {
-            if (retransmissionCounter >= 10 || breakTransmission) {
-                break;
-            }
+            int transmissionCounter = 0;
+            int retransmissionCounter = 0;
+            for (int i = 0; i < packets.size(); i++) {
+                if (retransmissionCounter >= 10 || breakTransmission) {
+                    break;
+                }
 
-            byte[] packet = packets.get(i);
-            sendRequest(packet, i);
+                byte[] packet = packets.get(i);
 
-            boolean noResponse = true;
-            long start = System.currentTimeMillis();
-            while (noResponse && !breakTransmission) {
+                String recievedString = client.sendBinaryPost(uri, packet);
+                System.out.println(recievedString);
+
+
+                //sendRequest(packet, i);
+
+                boolean noResponse = true;
+                long start = System.currentTimeMillis();
+                //while (noResponse && !breakTransmission) {
                 long stop = System.currentTimeMillis();
 
                 if (recievedString.contains("OK" + CR_LF) && !recievedString.contains("CORRUPTED-DATA") && !recievedString.contains("JUNK-INPUT")) {
+                    recievedString = "";
                     transmissionCounter = i;
                     retransmissionCounter = 0;
-                    recievedString = "";
                     noResponse = false;
                 } else if (recievedString.contains("ERROR" + CR_LF + CR_LF + "OK" + CR_LF)) {
+                    recievedString = "";
                     outputText("##Error - APPLICATION-ERROR -> retransmitting packet: " + i + "\n");
                     retransmissionCounter++;
                     i--;
-                    recievedString = "";
                     noResponse = false;
                 } else if (recievedString.contains("CORRUPTED-DATA" + CR_LF + CR_LF + "OK" + CR_LF)) {
+                    recievedString = "";
                     outputText("##Error - CORRUPTED-DATA -> retransmitting packet: " + i + "\n");
                     retransmissionCounter++;
                     i--;
-                    recievedString = "";
                     noResponse = false;
                 } else if (recievedString.contains("JUNK-INPUT" + CR_LF + CR_LF + "OK" + CR_LF)) {
-                    recoveryRequest();
+                    recievedString = "";
+                    if (!recoveryRequest()) {
+                        outputText("##The recovery was not successful.\n");
+                        breakTransmission = true;
+                    }
                     outputText("##Error - JUNK-INPUT -> retransmitting packet: " + i + "\n");
                     retransmissionCounter++;
                     i--;
-                    recievedString = "";
                     noResponse = false;
                 } else if ((stop - start) > TIMEOUT) {
-                    recoveryRequest();
+                    recievedString = "";
+                    if (!recoveryRequest()) {
+                        outputText("##The recovery was not successful.\n");
+                        breakTransmission = true;
+                    }
                     outputText("##Timeout, retransmitting packet: " + i + "\n");
                     retransmissionCounter++;
                     i--;
-                    recievedString = "";
                     noResponse = false;
-                }
-                try {
-                    Thread.sleep(1);
-                } catch (InterruptedException ex) {
-                    ex.printStackTrace();
+                    //}
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
+                    }
                 }
             }
+            if (transmissionCounter == packets.size() - 1) {
+                outputText("##Firmware successfully uploaded.\n");
+            } else {
+                outputText("##Fatal error transmitting firmware.\n");
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            uploadingFirmware = false;
+            //recievedString = "";
         }
-        if (transmissionCounter == packets.size() - 1) {
-            outputText("##Firmware successfully uploaded.\n");
-        } else {
-            outputText("##Fatal error transmitting firmware.\n");
-        }
-        uploadingFirmware = false;
-        recievedString = "";
     }
 
     public long calculateCrc(byte[] otaPacket) {
@@ -230,18 +249,29 @@ public class FileInPackets implements Runnable {
         }
     }
 
-    private void recoveryRequest() {
+    private boolean recoveryRequest() {
+        boolean success = false;
+        //recievedString = "";
         try {
-            recievedString = "";
-            outputStream.write("\r\n\r\n\r\n\r\n\r\n".getBytes());
-            while (!recievedString.contains("OK" + CR_LF)) {
-                Thread.sleep(1);
+            long start = System.currentTimeMillis();
+            //while (!recievedString.contains("OK" + CR_LF)) {
+            long stop = System.currentTimeMillis();
+            if ((stop - start) > TIMEOUT) {
+                success = false;
+                //break;
             }
+            success = true;
+            for (int i = 0; i < 5; i++) {
+                outputStream.write(CR_LF.getBytes());
+            }
+            Thread.sleep(1);
+            //System.out.println(recievedString);
+            //}
         } catch (Exception ex) {
             ex.printStackTrace();
+        } finally {
+            return success;
         }
-
-
     }
 
     private void outputText(String str) {

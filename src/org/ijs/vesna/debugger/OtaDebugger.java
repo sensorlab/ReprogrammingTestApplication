@@ -1,3 +1,5 @@
+package org.ijs.vesna.debugger;
+
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -15,6 +17,7 @@ import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 import javax.swing.JFileChooser;
 import javax.swing.UIManager;
+import javax.swing.SwingWorker;
 
 /**
  *
@@ -23,7 +26,7 @@ import javax.swing.UIManager;
 public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventListener {
 
     /**
-     * Creates new form SerialGUI
+     * Creates new form
      */
     public OtaDebugger() {
         try {
@@ -45,7 +48,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
     public List<Image> getIconImages() {
         ArrayList<Image> imageList = new ArrayList<Image>();
         //imageList.add(new ImageIcon(System.getProperty("user.dir") + System.getProperty("file.separator") + "SensorLab-Logo.png").getImage());
-        imageList.add(Toolkit.getDefaultToolkit().getImage(OtaDebugger.class.getResource("SensorLab-Logo.png")));
+        imageList.add(Toolkit.getDefaultToolkit().getImage(OtaDebugger.class.getResource("../logo/SensorLab-Logo.png")));
         return imageList;
     }
 
