@@ -1,10 +1,10 @@
-package org.ijs.vesna.debugger;
+package org.ijs.vesna.otadebugger.view;
 
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * To change this template, choose Tools | Templates and open the template in
+ * the editor.
  */
-
+import org.ijs.vesna.otadebugger.model.FileInPackets;
 import gnu.io.*;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -13,28 +13,32 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.TooManyListenersException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 import javax.swing.JFileChooser;
 import javax.swing.UIManager;
 import javax.swing.SwingWorker;
+import javax.swing.UIManager;
 
 /**
  *
  * @author Matevz
  */
-public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventListener {
+public class OtaDebuggerGui extends javax.swing.JFrame implements SerialPortEventListener {
 
     /**
      * Creates new form
      */
-    public OtaDebugger() {
+    public OtaDebuggerGui() {
         try {
             String laf = UIManager.getSystemLookAndFeelClassName();
             UIManager.setLookAndFeel(laf);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+
         getPorts();
         initComponents();
         //Display some instructions upon opening
@@ -48,7 +52,7 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
     public List<Image> getIconImages() {
         ArrayList<Image> imageList = new ArrayList<Image>();
         //imageList.add(new ImageIcon(System.getProperty("user.dir") + System.getProperty("file.separator") + "SensorLab-Logo.png").getImage());
-        imageList.add(Toolkit.getDefaultToolkit().getImage(OtaDebugger.class.getResource("../logo/SensorLab-Logo.png")));
+        imageList.add(Toolkit.getDefaultToolkit().getImage(OtaDebuggerGui.class.getResource("../../logo/SensorLab-Logo.png")));
         return imageList;
     }
 
@@ -478,23 +482,28 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
     }//GEN-LAST:event_uploadButtonActionPerformed
 
     private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
-        int returnVal = fc.showOpenDialog(OtaDebugger.this);
+        int returnVal = fc.showOpenDialog(OtaDebuggerGui.this);
 
         if (returnVal == JFileChooser.APPROVE_OPTION) {
+            firmwareTextField.setText("");
+            firmwareSizeNumLabel.setText("  ");
+            crcNumLabel.setText("  ");
+            file = null;
             file = fc.getSelectedFile();
             if (file.length() < MB) {
                 firmwareTextField.setText(file.getAbsolutePath());
                 try {
                     FileInputStream fin = new FileInputStream(file);
                     try {
-                        Checksum checksum = new CRC32();
-                        int b = 0;
-                        while ((b = fin.read()) != -1) {
-                            checksum.update(b);
-                        }
+                        /*
+                         * Checksum checksum = new CRC32(); int b = 0; while ((b
+                         * = fin.read()) != -1) { checksum.update(b); }
+                         * firmwareSizeNumLabel.setText(Long.toString(file.length()));
+                         * crcNumLabel.setText(Long.toString(checksum.getValue()));
+                         */
+                        (new CrcCalculator()).execute();
                         firmwareSizeNumLabel.setText(Long.toString(file.length()));
-                        crcNumLabel.setText(Long.toString(checksum.getValue()));
-                    } catch (IOException ex) {
+                    } catch (Exception ex) {
                         ex.printStackTrace();
                     } finally {
                         fin.close();
@@ -569,13 +578,52 @@ public class OtaDebugger extends javax.swing.JFrame implements SerialPortEventLi
         }
     }
 
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
+    class CrcCalculator extends SwingWorker<Long, Object> {
 
-            public void run() {
-                new OtaDebugger().setVisible(true);
+        @Override
+        protected Long doInBackground() throws Exception {
+            FileInputStream fin = new FileInputStream(file);
+
+            Checksum checksum = new CRC32();
+            int b = 0;
+            while ((b = fin.read()) != -1) {
+                checksum.update(b);
             }
-        });
+
+            return checksum.getValue();
+        }
+
+        @Override
+        protected void done() {
+            try {
+                crcNumLabel.setText(Long.toString(get()));
+            } catch (Exception ignore) {
+            }
+        }
+    }
+
+    class Get extends SwingWorker<Long, Object> {
+
+        @Override
+        protected Long doInBackground() throws Exception {
+            FileInputStream fin = new FileInputStream(file);
+
+            Checksum checksum = new CRC32();
+            int b = 0;
+            while ((b = fin.read()) != -1) {
+                checksum.update(b);
+            }
+
+            return checksum.getValue();
+        }
+
+        @Override
+        protected void done() {
+            try {
+                crcNumLabel.setText(Long.toString(get()));
+            } catch (Exception ignore) {
+            }
+        }
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton SendButton;

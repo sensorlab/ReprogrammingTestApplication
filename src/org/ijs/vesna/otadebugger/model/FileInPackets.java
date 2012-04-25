@@ -1,12 +1,14 @@
-package org.ijs.vesna.debugger;
+package org.ijs.vesna.otadebugger.model;
 
 /*
  * To change this template, choose Tools | Templates and open the template in
  * the editor.
  */
+import org.ijs.vesna.otadebugger.controller.Comunicator;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.concurrent.Semaphore;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 import javax.swing.JTextArea;
@@ -29,7 +31,7 @@ public class FileInPackets implements Runnable {
     //private String recievedString;
     private boolean uploadingFirmware = false;
     private boolean breakTransmission = false;
-    private Comunicator client;
+    private Comunicator client;    
 
     public FileInPackets() {
     }

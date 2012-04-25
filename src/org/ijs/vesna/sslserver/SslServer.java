@@ -7,6 +7,7 @@ package org.ijs.vesna.sslserver;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import javax.net.ssl.SSLServerSocketFactory;
 
 /**
@@ -21,14 +22,25 @@ public class SslServer implements Runnable {
     private int port;
     private boolean socketOpened = false;
     private boolean runServer = true;
+    private ArrayList<SslDataListener> SslServerListenersRegister = new ArrayList<SslDataListener>();
 
     public SslServer(int port) {
         this.port = port;
     }
 
-    public void addListener(SslDataListener sslDataListener) {
-        this.sslDataListener = sslDataListener;
-    }   
+    public void addSslServerListener(SslDataListener listener) {
+        SslServerListenersRegister.add(listener);
+    }
+
+    public void removeSslServerListener(SslDataListener listener) {
+        SslServerListenersRegister.remove(listener);
+    }
+
+    public void notifySslServerListeners(String line) {
+        for (int i = 0; i < SslServerListenersRegister.size(); i++) {
+            ((SslDataListener) SslServerListenersRegister.get(i)).notifySslDataListener(line);
+        }
+    }
 
     public synchronized void write(String str) {
         if (writer != null && socketOpened) {
@@ -72,7 +84,7 @@ public class SslServer implements Runnable {
                             String line = null;
                             while ((line = reader.readLine()) != null) {
                                 if (!line.equals("close")) {
-                                    sslDataListener.notifySslDataListener(line);
+                                    notifySslServerListeners(line);
                                 } else {
                                     runServer = false;
                                     break;
