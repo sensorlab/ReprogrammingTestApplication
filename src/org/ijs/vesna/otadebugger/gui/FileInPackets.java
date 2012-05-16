@@ -1,0 +1,99 @@
+package org.ijs.vesna.otadebugger.gui;
+
+/*
+ * To change this template, choose Tools | Templates and open the template in
+ * the editor.
+ */
+import java.io.*;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.concurrent.Semaphore;
+import java.util.zip.CRC32;
+import java.util.zip.Checksum;
+import javax.swing.JTextArea;
+import org.ijs.vesna.otadebugger.communicator.Comunicator;
+
+/**
+ *
+ * @author Matevz
+ */
+public class FileInPackets {
+
+    private static final int PACKET_SIZE = 512;
+    private static final int TIMEOUT = 30000; // transmission timeout in ms
+    private static final String CR_LF = "\r\n";
+    private File otaImage;
+    private long otaImageSize;
+
+    public ArrayList<byte[]> getOtaPackets() {
+        ArrayList<byte[]> otaPackets = new ArrayList<byte[]>();
+        try {
+            FileInputStream fin = new FileInputStream(otaImage);
+            try {
+                byte[] packetBuffer = new byte[PACKET_SIZE];
+                int countBytes = 0;
+                int b = 0;
+                while ((b = fin.read()) != -1) {
+                    packetBuffer[countBytes++] = (byte) b;
+                    if (countBytes == PACKET_SIZE) {
+                        otaPackets.add(packetBuffer);
+                        packetBuffer = new byte[PACKET_SIZE];
+                        countBytes = 0;
+                    }
+                }
+                otaPackets.add(packetBuffer);
+
+                // fill the last buffer with FFs
+                int packetsLen = otaPackets.size() * PACKET_SIZE;
+                int numOfFF = packetsLen - (int) otaImageSize;
+                for (int i = 0; i < numOfFF; i++) {
+                    byte[] lastPacket = otaPackets.get(otaPackets.size() - 1);
+                    lastPacket[(lastPacket.length - 1) - i] = (byte) 255;
+                    otaPackets.set(otaPackets.size() - 1, lastPacket);
+                }
+                addPacketsHeader(otaPackets);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            } finally {
+                fin.close();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return otaPackets;
+    }
+
+    public byte[] intToByteArray(int value) {
+        return new byte[]{
+                    (byte) (value >>> 24),
+                    (byte) (value >>> 16),
+                    (byte) (value >>> 8),
+                    (byte) value};
+    }
+
+    public ArrayList<byte[]> addPacketsHeader(ArrayList<byte[]> packets) {
+        for (int i = 0; i < packets.size(); i++) {
+            ByteArrayOutputStream os = new ByteArrayOutputStream(PACKET_SIZE + 8);
+            byte[] offset = intToByteArray(i);
+            os.write(offset, 0, offset.length);
+            int tmp = packets.get(i).length;
+            os.write(packets.get(i), 0, packets.get(i).length);
+            long numCrc = calculateCrc(os.toByteArray());
+            byte[] crc = ByteBuffer.allocate(8).putLong(numCrc).array();
+            os.write(crc, 4, crc.length - 4);
+            packets.set(i, os.toByteArray());
+        }
+
+        return packets;
+    }
+
+    public long calculateCrc(byte[] otaPacket) {
+        Checksum checksum = new CRC32();
+        checksum.update(otaPacket, 0, otaPacket.length);
+        return checksum.getValue();
+    }
+
+    public long getOtaImageSize() {
+        return otaImageSize;
+    }
+}
