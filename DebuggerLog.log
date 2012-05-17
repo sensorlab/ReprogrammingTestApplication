@@ -2624,3 +2624,7 @@
 2012-05-16 18:08:36,042 [Thread-5] ERROR Comunicator - java.io.IOException: Stream closed
 2012-05-16 18:08:36,042 [Thread-5] ERROR Comunicator - java.io.IOException: Stream closed
 2012-05-16 19:06:34,043 [SwingWorker-pool-2-thread-2] ERROR Comunicator - java.lang.NullPointerException
+2012-05-16 19:35:16,216 [SwingWorker-pool-2-thread-2] ERROR Comunicator - java.lang.NullPointerException
+2012-05-16 19:35:24,467 [SwingWorker-pool-2-thread-3] ERROR Comunicator - java.lang.NullPointerException
+2012-05-17 14:02:59,508 [AWT-EventQueue-0] ERROR Comunicator - java.lang.NumberFormatException: For input string: "13df"
+2012-05-17 14:13:06,284 [AWT-EventQueue-0] ERROR Comunicator - java.lang.NumberFormatException: For input string: "qwedw"

@@ -410,16 +410,8 @@ public class OtaDebuggerGui extends javax.swing.JFrame {
     }//GEN-LAST:event_baudSetButtonActionPerformed
 
     private void portBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_portBoxActionPerformed
-        if (comm.isOpen()) { //if port open, make user close port before changing port
-            textWin.append("##Must Close Port Before Changing Port.\n");
-            //JOptionPane.showMessageDialog(this, "Must Close Port Before Changing Port.");
-        } else if (portBox.getSelectedItem().equals("Select Port")) {
-            textWin.append("##Must Select Valid Port.\n");
-        } else {
-            String newPortName = (String) portBox.getSelectedItem();
-            comm.setPortName(newPortName);
-            textWin.append("##Port Selected: " + comm.getPortName() + ", Baud Rate: " + comm.getBaudRate() + ".\n");
-        }
+        String response = comm.setPortName((String) portBox.getSelectedItem());
+        outputText(response);
     }//GEN-LAST:event_portBoxActionPerformed
 
     private void getTextbarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_getTextbarActionPerformed
@@ -481,7 +473,7 @@ public class OtaDebuggerGui extends javax.swing.JFrame {
 
     private void serialRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_serialRadioButtonActionPerformed
         clearButtonActionPerformed(evt);
-        textWin.append("##Select Port, Specify Baud Rate (default " + comm.getBaudRate() + "), Open Port.\n");
+        outputText("##Select Port, Specify Baud Rate (default " + comm.getBaudRate() + "), Open Port.\n");
         // TODO Close SSL connection and get serial ports
 
         (new GetPorts()).execute();
@@ -496,14 +488,15 @@ public class OtaDebuggerGui extends javax.swing.JFrame {
     }//GEN-LAST:event_serialRadioButtonActionPerformed
 
     private void sslRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sslRadioButtonActionPerformed
+        comm.closeSerialConnection();
         clearButtonActionPerformed(evt);
         outputText("##Select the port to which the SSL server will listen.\n");
-        // TODO Close serial connection
 
         portBox.setModel(new javax.swing.DefaultComboBoxModel());
 
         portBox.setEnabled(false);
         portToggleButton.setEnabled(false);
+        portToggleButton.setText("Open Serial Port");
         baudTextField.setEnabled(false);
         baudSetButton.setEnabled(false);
 
@@ -512,14 +505,15 @@ public class OtaDebuggerGui extends javax.swing.JFrame {
     }//GEN-LAST:event_sslRadioButtonActionPerformed
 
     private void portToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_portToggleButtonActionPerformed
-        boolean portOpened = comm.openSerialConnection();
-        if (portOpened) {
-            portToggleButton.setText("Close Serial Port");
-            textWin.append("##Opening Port: " + comm.getPortName() + ", Baud Rate: " + comm.getBaudRate() + ".\n");
-        } else {
+        String response = "";
+        if (comm.isOpen()) {
+            response = comm.closeSerialConnection();
             portToggleButton.setText("Open Serial Port");
-            textWin.append("##Port " + comm.getPortName() + " is now closed.\n");
+        } else {
+            response = comm.openSerialConnection();
+            portToggleButton.setText("Close Serial Port");
         }
+        outputText(response);
     }//GEN-LAST:event_portToggleButtonActionPerformed
 
     private void sendPostButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sendPostButtonActionPerformed
@@ -594,7 +588,7 @@ public class OtaDebuggerGui extends javax.swing.JFrame {
             }
         }
     }
-    
+
     class SendPost extends SwingWorker<String, Object> {
 
         @Override
