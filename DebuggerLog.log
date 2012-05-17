@@ -2628,3 +2628,11 @@
 2012-05-16 19:35:24,467 [SwingWorker-pool-2-thread-3] ERROR Comunicator - java.lang.NullPointerException
 2012-05-17 14:02:59,508 [AWT-EventQueue-0] ERROR Comunicator - java.lang.NumberFormatException: For input string: "13df"
 2012-05-17 14:13:06,284 [AWT-EventQueue-0] ERROR Comunicator - java.lang.NumberFormatException: For input string: "qwedw"
+2012-05-17 18:29:08,168 [SwingWorker-pool-2-thread-2] ERROR Comunicator - java.lang.NullPointerException
+2012-05-17 18:29:21,483 [SwingWorker-pool-2-thread-3] ERROR Comunicator - java.lang.NullPointerException
+2012-05-17 18:29:27,760 [SwingWorker-pool-2-thread-4] ERROR Comunicator - java.lang.NullPointerException
+2012-05-17 18:29:29,109 [SwingWorker-pool-2-thread-5] ERROR Comunicator - java.lang.NullPointerException
+2012-05-17 18:29:29,294 [SwingWorker-pool-2-thread-6] ERROR Comunicator - java.lang.NullPointerException
+2012-05-17 18:29:51,154 [SwingWorker-pool-2-thread-1] ERROR Comunicator - java.lang.NullPointerException
+2012-05-17 18:29:51,947 [SwingWorker-pool-2-thread-2] ERROR Comunicator - java.lang.NullPointerException
+2012-05-17 18:29:52,385 [SwingWorker-pool-2-thread-3] ERROR Comunicator - java.lang.NullPointerException

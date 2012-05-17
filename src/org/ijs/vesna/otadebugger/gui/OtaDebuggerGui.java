@@ -387,8 +387,13 @@ public class OtaDebuggerGui extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void sendGetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sendGetButtonActionPerformed
-        getMsg = getTextbar.getText();
-        (new SendGet()).execute();
+        if (comm.isOpen()) {
+            getMsg = getTextbar.getText();
+            (new SendGet()).execute();
+        } else {
+            outputText("##Must open serial connection first.\n");
+        }
+
     }//GEN-LAST:event_sendGetButtonActionPerformed
 
     private void clearButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearButtonActionPerformed
@@ -517,9 +522,13 @@ public class OtaDebuggerGui extends javax.swing.JFrame {
     }//GEN-LAST:event_portToggleButtonActionPerformed
 
     private void sendPostButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sendPostButtonActionPerformed
-        resource = postResourceTextField.getText();
-        postMsg = postContentTextField.getText();
-        (new SendPost()).execute();
+        if (comm.isOpen()) {
+            resource = postResourceTextField.getText();
+            postMsg = postContentTextField.getText();
+            (new SendPost()).execute();
+        } else {
+            outputText("##Must open serial connection first.\n");
+        }
     }//GEN-LAST:event_sendPostButtonActionPerformed
 
     private void postContentTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_postContentTextFieldActionPerformed
