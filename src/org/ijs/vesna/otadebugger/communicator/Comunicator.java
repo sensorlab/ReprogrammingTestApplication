@@ -6,6 +6,7 @@ package org.ijs.vesna.otadebugger.communicator;
 
 import gnu.io.*;
 import java.io.*;
+import java.nio.ByteBuffer;
 import java.util.Enumeration;
 import java.util.concurrent.Semaphore;
 import java.util.zip.CRC32;
@@ -20,14 +21,19 @@ import org.ijs.vesna.sslserver.SslDataListener;
 public class Comunicator implements SslDataListener {
     //constants
 
+    private static final String nl = "\n";
     private static final String CR_LF = "\r\n";
     private static final String GET = "GET ";
     private static final String POST = "POST ";
     private static final String LEN = "Length=";
     private static final String CRC = "CRC=";
-    private static final String RESPONSE_END = "OK";
+    private static final String RESPONSE_END = "\r\nOK\r\n";
+    private static final String JUNK_INPUT = "\r\nJUNK-INPUT\r\n";
+    private static final String CORRUPTED_DATA = "\r\nCORRUPTED-DATA\r\n";
+    private static final String ERROR = "\r\nERROR\r\n";
     private static final int SEMAPHORE = 1;
     private static final int MAX_PORTS = 20;
+    private static final int MAX_RETRANSMISSIONS = 10;
     private static final Logger logger = Logger.getLogger(Comunicator.class);
     private InputStream inputStream;
     private OutputStream outputStream;
@@ -58,18 +64,42 @@ public class Comunicator implements SslDataListener {
     public Comunicator() {
     }
 
-    public String sendGet(String params) {
+    public String sendGet(byte[] params) {
+        String errorReport = "";
         if (semaphore.tryAcquire()) {
             try {
-                String req = GET + params + CR_LF;
+                for (int i = 0; i < MAX_RETRANSMISSIONS; i++) {                    
+                    outputStream.write(GET.getBytes());
+                    outputStream.write(params);
+                    outputStream.write(CR_LF.getBytes());
 
-                outputStream.write(req.getBytes());
-
-                receivedBuffer = "";
-                while (!receivedBuffer.contains(RESPONSE_END) && open) {
-                    try {
-                        Thread.sleep(1);
-                    } catch (InterruptedException ignore) {
+                    receivedBuffer = "";
+                    while (!receivedBuffer.contains(RESPONSE_END) && open) {
+                        try {
+                            Thread.sleep(1);
+                        } catch (InterruptedException ignore) {
+                        }
+                    }
+                    receivedBuffer = receivedBuffer.replace(RESPONSE_END, "");
+                    if (receivedBuffer.contains(JUNK_INPUT)
+                            || receivedBuffer.contains(CORRUPTED_DATA)) {
+                        receivedBuffer = receivedBuffer.replace(JUNK_INPUT, "");
+                        receivedBuffer = receivedBuffer.replace(CORRUPTED_DATA, "");
+                        String junkReport = receivedBuffer;
+                        sendRecoveryRequest();
+                        if (i == MAX_RETRANSMISSIONS - 1) {
+                            receivedBuffer = junkReport
+                                    + nl + "fatal error request did not go through, retransmissions: " + (i + 1) + nl;
+                        } else {
+                            receivedBuffer = junkReport
+                                    + nl + "send with retransmissions: " + (i + 1) + nl;
+                        }
+                    } else if (receivedBuffer.contains(ERROR)) {
+                        receivedBuffer = receivedBuffer.replace(ERROR, "");
+                        errorReport = receivedBuffer
+                                + nl + "send with retransmissions: " + (i + 1) + nl;
+                    } else {
+                        return receivedBuffer + nl;
                     }
                 }
             } catch (Exception ex) {
@@ -80,7 +110,7 @@ public class Comunicator implements SslDataListener {
         } else {
             receivedBuffer = "##ERROR: Communication in progress\n";
         }
-        return receivedBuffer;
+        return receivedBuffer + errorReport + "\n";
     }
 
     public String sendPost(String uri, String content) {
@@ -111,34 +141,20 @@ public class Comunicator implements SslDataListener {
         } else {
             receivedBuffer = "##ERROR: Communication in progress\n";
         }
-        return receivedBuffer + "\n";
-    }
-
-    public String sendBinaryGet(byte[] params) {
-        if (semaphore.tryAcquire()) {
-            try {
-                //writer.write(GET);
-                outputStream.write(params, 0, params.length);
-                //writer.write(CR_LF);
-
-                receivedBuffer = "";
-                while (!receivedBuffer.equals(RESPONSE_END)) {
-                    try {
-                        Thread.sleep(1);
-                    } catch (InterruptedException ignore) {
-                    }
-                }
-            } catch (Exception ex) {
-                logger.error(ex);
-            } finally {
-                semaphore.release();
-            }
-        } else {
-            receivedBuffer = "##ERROR: Communication in progress\n";
-        }
         return receivedBuffer;
     }
 
+    /*
+     * public String sendBinaryGet(byte[] params) { if (semaphore.tryAcquire())
+     * { try { //writer.write(GET); outputStream.write(params, 0,
+     * params.length); //writer.write(CR_LF);
+     *
+     * receivedBuffer = ""; while (!receivedBuffer.equals(RESPONSE_END)) { try {
+     * Thread.sleep(1); } catch (InterruptedException ignore) { } } } catch
+     * (Exception ex) { logger.error(ex); } finally { semaphore.release(); } }
+     * else { receivedBuffer = "##ERROR: Communication in progress\n"; } return
+     * receivedBuffer; }
+     */
     public String sendBinaryPost(String uri, byte[] content) {
         if (semaphore.tryAcquire()) {
             try {
@@ -175,31 +191,31 @@ public class Comunicator implements SslDataListener {
         return receivedBuffer;
     }
 
-    public String sendRecoveryRequest() {
-        if (semaphore.tryAcquire()) {
-            try {
-                String req = CR_LF;
+    private void sendRecoveryRequest() {
+        //if (semaphore.tryAcquire()) {
+        try {
+            String req = CR_LF;
 
-                for (int i = 0; i < 5; i++) {
-                    //writer.write(req);
-                }
-
-                receivedBuffer = "";
-                while (!receivedBuffer.equals(RESPONSE_END)) {
-                    try {
-                        Thread.sleep(1);
-                    } catch (InterruptedException ignore) {
-                    }
-                }
-            } catch (Exception ex) {
-                logger.error(ex);
-            } finally {
-                semaphore.release();
+            for (int i = 0; i < 5; i++) {
+                outputStream.write(req.getBytes());
             }
-        } else {
-            receivedBuffer = "##ERROR: Communication in progress\n";
+
+            receivedBuffer = "";
+            while (!receivedBuffer.contains(RESPONSE_END) && open) {
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException ignore) {
+                }
+            }
+        } catch (Exception ex) {
+            logger.error(ex);
+        } finally {
+            semaphore.release();
         }
-        return receivedBuffer;
+        //} else {
+        //receivedBuffer = "##ERROR: Communication in progress\n";
+        //}
+        //return receivedBuffer;
     }
 
     public String setBaudRate(String userBaudRate) {
@@ -231,7 +247,8 @@ public class Comunicator implements SslDataListener {
             commPort = portIdentifier.open(this.getClass().getName(), 2000);
             serialPort = (SerialPort) commPort;//cast all to serial
             //set baudrate, 8N1 stopbits, no parity
-            serialPort.setSerialPortParams(baudRate, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+            serialPort.setSerialPortParams(baudRate, SerialPort.DATABITS_8,
+                    SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
             //start I/O streams
             inputStream = serialPort.getInputStream();
             outputStream = serialPort.getOutputStream();
@@ -303,7 +320,6 @@ public class Comunicator implements SslDataListener {
                 if (!portName.equals("")) {
                     response = connect(portName);
                     (new Thread(new SerialReader(inputStream))).start();
-                    response = "##Opening Port: " + portName + ", Baud Rate: " + baudRate + ".\n";
                 } else {
                     response = "##Must Select Valid Port.\n";
                 }
@@ -340,7 +356,7 @@ public class Comunicator implements SslDataListener {
             }
             response = "##Serial Port: " + portName + " is now closed.\n";
             portName = "";
-            baudRate = 115200;            
+            baudRate = 115200;
         }
         return response;
     }
