@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.TooManyListenersException;
+import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.CRC32;
@@ -28,7 +29,7 @@ import org.ijs.vesna.otadebugger.communicator.Comunicator;
  * @author Matevz
  */
 public class OtaDebuggerGui extends javax.swing.JFrame {
-    
+
     private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(OtaDebuggerGui.class);
 
     /**
@@ -42,7 +43,7 @@ public class OtaDebuggerGui extends javax.swing.JFrame {
             ex.printStackTrace();
         }
         DOMConfigurator.configure("log4jConfig.xml");
-        
+
         initComponents();
         //Display some instructions upon opening
         outputText("##Select the port to which the SSL server will listen.\n");
@@ -51,7 +52,7 @@ public class OtaDebuggerGui extends javax.swing.JFrame {
         //Create a file chooser
         fc = new JFileChooser();
     }
-    
+
     @Override
     public List<Image> getIconImages() {
         ArrayList<Image> imageList = new ArrayList<Image>();
@@ -236,6 +237,11 @@ public class OtaDebuggerGui extends javax.swing.JFrame {
 
         sslSetPortButton.setText("Open SSL Port");
         sslSetPortButton.setPreferredSize(new java.awt.Dimension(110, 23));
+        sslSetPortButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sslSetPortButtonActionPerformed(evt);
+            }
+        });
 
         portToggleButton.setText("Open Serial Port");
         portToggleButton.setEnabled(false);
@@ -388,20 +394,24 @@ public class OtaDebuggerGui extends javax.swing.JFrame {
 
     private void sendGetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sendGetButtonActionPerformed
         if (comm.isOpen()) {
-            getMsg = getTextbar.getText();
-            (new SendGet()).execute();
-            getTextbar.selectAll();
+            if (getTextbar.getText() != null) {
+                getMsg = getTextbar.getText();
+                (new SendGet()).execute();
+                getTextbar.selectAll();
+            } else {
+                outputText("##Must input proper resource name.\n");
+            }
         } else {
             outputText("##Must open serial connection first.\n");
         }
-        
+
     }//GEN-LAST:event_sendGetButtonActionPerformed
-    
+
     private void clearButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearButtonActionPerformed
         //remove all text from the window
         textWin.replaceRange("", 0, textWin.getText().length());
 }//GEN-LAST:event_clearButtonActionPerformed
-    
+
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         if (sslRadioButton.isSelected()) {
             // TODO close SSL Server
@@ -409,32 +419,43 @@ public class OtaDebuggerGui extends javax.swing.JFrame {
             comm.closeSerialConnection();
         }
     }//GEN-LAST:event_formWindowClosing
-    
+
     private void baudSetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_baudSetButtonActionPerformed
         String returnMsg = comm.setBaudRate(baudTextField.getText());
         outputText(returnMsg);
     }//GEN-LAST:event_baudSetButtonActionPerformed
-    
+
     private void portBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_portBoxActionPerformed
         String response = comm.setPortName((String) portBox.getSelectedItem());
         outputText(response);
     }//GEN-LAST:event_portBoxActionPerformed
-    
+
     private void getTextbarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_getTextbarActionPerformed
         sendGetButtonActionPerformed(evt);
     }//GEN-LAST:event_getTextbarActionPerformed
-    
+
     private void baudTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_baudTextFieldActionPerformed
         //hitting "enter" does the same thing as pressing the "Set Baud" button
         baudSetButtonActionPerformed(evt);
     }//GEN-LAST:event_baudTextFieldActionPerformed
-    
+
     private void uploadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uploadButtonActionPerformed
+        if (comm.isOpen()) {
+            if (postResourceTextField.getText() != null) {
+                firmwareResource = uriTextField.getText();
+                (new SendFirmware()).execute();
+                postContentTextField.selectAll();
+            } else {
+                outputText("##Must input proper resource name.\n");
+            }
+        } else {
+            outputText("##Must open serial connection first.\n");
+        }
     }//GEN-LAST:event_uploadButtonActionPerformed
-    
+
     private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
         int returnVal = fc.showOpenDialog(OtaDebuggerGui.this);
-        
+
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             firmwareTextField.setText("");
             firmwareSizeNumLabel.setText("  ");
@@ -444,21 +465,8 @@ public class OtaDebuggerGui extends javax.swing.JFrame {
             if (file.length() < MB) {
                 firmwareTextField.setText(file.getAbsolutePath());
                 try {
-                    FileInputStream fin = new FileInputStream(file);
-                    try {
-                        /*
-                         * Checksum checksum = new CRC32(); int b = 0; while ((b
-                         * = fin.read()) != -1) { checksum.update(b); }
-                         * firmwareSizeNumLabel.setText(Long.toString(file.length()));
-                         * crcNumLabel.setText(Long.toString(checksum.getValue()));
-                         */
-                        (new CrcCalculator()).execute();
-                        firmwareSizeNumLabel.setText(Long.toString(file.length()));
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    } finally {
-                        fin.close();
-                    }
+                    (new CrcCalculator()).execute();
+                    firmwareSizeNumLabel.setText(Long.toString(file.length()));
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
@@ -472,44 +480,45 @@ public class OtaDebuggerGui extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_browseButtonActionPerformed
-    
+
     private void uriTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uriTextFieldActionPerformed
         uploadButtonActionPerformed(evt);
     }//GEN-LAST:event_uriTextFieldActionPerformed
-    
+
     private void serialRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_serialRadioButtonActionPerformed
         clearButtonActionPerformed(evt);
         outputText("##Select Port, Specify Baud Rate (default " + comm.getBaudRate() + "), Open Port.\n");
         // TODO Close SSL connection and get serial ports
 
         (new GetPorts()).execute();
-        
+
         sslPortTextField.setEnabled(false);
         sslSetPortButton.setEnabled(false);
-        
+
         portBox.setEnabled(true);
         portToggleButton.setEnabled(true);
         baudTextField.setEnabled(true);
         baudSetButton.setEnabled(true);
     }//GEN-LAST:event_serialRadioButtonActionPerformed
-    
+
     private void sslRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sslRadioButtonActionPerformed
-        comm.closeSerialConnection();
         clearButtonActionPerformed(evt);
+        String res = comm.endSerialConnection();
+        outputText(res);        
         outputText("##Select the port to which the SSL server will listen.\n");
-        
+
         portBox.setModel(new javax.swing.DefaultComboBoxModel());
-        
+
         portBox.setEnabled(false);
         portToggleButton.setEnabled(false);
         portToggleButton.setText("Open Serial Port");
         baudTextField.setEnabled(false);
         baudSetButton.setEnabled(false);
-        
+
         sslPortTextField.setEnabled(true);
         sslSetPortButton.setEnabled(true);
     }//GEN-LAST:event_sslRadioButtonActionPerformed
-    
+
     private void portToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_portToggleButtonActionPerformed
         String response = "";
         if (comm.isOpen()) {
@@ -517,45 +526,60 @@ public class OtaDebuggerGui extends javax.swing.JFrame {
             portToggleButton.setText("Open Serial Port");
         } else {
             response = comm.openSerialConnection();
-            portToggleButton.setText("Close Serial Port");
+            if (comm.isOpen()) {
+                portToggleButton.setText("Close Serial Port");
+            }
         }
         outputText(response);
     }//GEN-LAST:event_portToggleButtonActionPerformed
-    
+
     private void sendPostButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sendPostButtonActionPerformed
         if (comm.isOpen()) {
-            resource = postResourceTextField.getText();
-            postMsg = postContentTextField.getText();
-            (new SendPost()).execute();
+            if (postResourceTextField.getText() != null) {
+                resource = postResourceTextField.getText();
+                if (postContentTextField.getText() != null) {
+                    postMsg = postContentTextField.getText();
+                    (new SendPost()).execute();
+                    postContentTextField.selectAll();
+                } else {
+                    outputText("##Must input proper content.\n");
+                }
+            } else {
+                outputText("##Must input proper resource name.\n");
+            }
         } else {
             outputText("##Must open serial connection first.\n");
         }
     }//GEN-LAST:event_sendPostButtonActionPerformed
-    
+
     private void postContentTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_postContentTextFieldActionPerformed
         sendPostButtonActionPerformed(evt);
     }//GEN-LAST:event_postContentTextFieldActionPerformed
-    
+
+    private void sslSetPortButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sslSetPortButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_sslSetPortButtonActionPerformed
+
     private void outputText(String str) {
         textWin.append(str);
         textWin.setCaretPosition(textWin.getText().length());
     }
-    
+
     class CrcCalculator extends SwingWorker<Long, Object> {
-        
+
         @Override
         protected Long doInBackground() throws Exception {
             FileInputStream fin = new FileInputStream(file);
-            
+
             Checksum checksum = new CRC32();
             int b = 0;
             while ((b = fin.read()) != -1) {
                 checksum.update(b);
             }
-            
+
             return checksum.getValue();
         }
-        
+
         @Override
         protected void done() {
             try {
@@ -564,16 +588,16 @@ public class OtaDebuggerGui extends javax.swing.JFrame {
             }
         }
     }
-    
+
     class GetPorts extends SwingWorker<String[], Object> {
-        
+
         @Override
         protected String[] doInBackground() throws Exception {
             String[] portList = comm.getPorts();
-            
+
             return portList;
         }
-        
+
         @Override
         protected void done() {
             try {
@@ -582,15 +606,15 @@ public class OtaDebuggerGui extends javax.swing.JFrame {
             }
         }
     }
-    
+
     class SendGet extends SwingWorker<String, Object> {
-        
+
         @Override
         protected String doInBackground() throws Exception {
             outputText(getMsg + "\n\n");
             return comm.sendGet(getMsg.getBytes());
         }
-        
+
         @Override
         protected void done() {
             try {
@@ -599,26 +623,80 @@ public class OtaDebuggerGui extends javax.swing.JFrame {
             }
         }
     }
-    
+
     class SendPost extends SwingWorker<String, Object> {
+
+        @Override
+        protected String doInBackground() throws Exception {
+            outputText(resource + "\n");
+            outputText(postMsg + "\n\n");
+            return comm.sendPost(resource, postMsg.getBytes());
+        }
+
+        @Override
+        protected void done() {
+            try {
+                outputText(get());
+            } catch (Exception ignore) {
+            }
+        }
+    }
+
+    class SendFirmware extends SwingWorker<String, String> {
+        boolean success = false;
         
         @Override
         protected String doInBackground() throws Exception {
-            return comm.sendPost(resource, postMsg);
+            String response = "";            
+
+            if (semaphore.tryAcquire()) {
+                outputText(firmwareResource + "\n\n");
+                try {
+                    ArrayList<byte[]> firmware = fip.getOtaPackets(file);
+                    for (int i = 0; i < firmware.size(); i++) {
+                        response = comm.sendPost(firmwareResource, firmware.get(i));
+                        publish(response);
+
+                        if (!comm.isOpen()) {
+                            success = false;                            
+                            return response;
+                        }
+                    }
+                    success = true;                    
+                } catch (Exception ex) {
+                    logger.error(ex);
+                } finally {
+                    semaphore.release();
+                }
+            } else {
+                outputText("##Must open serial connection first.\n");
+            }
+            return response;
         }
-        
+
         @Override
         protected void done() {
             try {
                 outputText(get());
+                if(success) {
+                    outputText("Firmware successfully uploaded\n");
+                } else {
+                    outputText("Firmware uploaded interrupted\n");
+                }
+                semaphore.release();
             } catch (Exception ignore) {
             }
         }
+
+        @Override
+        protected void process(List<String> res) {
+            outputText(res.get(0));
+        }
     }
-    
+
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
-            
+
             public void run() {
                 new OtaDebuggerGui().setVisible(true);
             }
@@ -675,6 +753,9 @@ public class OtaDebuggerGui extends javax.swing.JFrame {
     private String getMsg;
     private String resource;
     private String postMsg;
+    private String firmwareResource;
+    private static final int SEMAPHORE = 1;
+    private final Semaphore semaphore = new Semaphore(SEMAPHORE, true);
     //constants
     static final int MAX_PORTS = 20;    //maximum number of ports to look for
     static final int MAX_DATA = 64;     //maximum length of serial data received

@@ -395,6 +395,9 @@
           <Dimension value="[110, 23]"/>
         </Property>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="sslSetPortButtonActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="portToggleButton">
       <Properties>

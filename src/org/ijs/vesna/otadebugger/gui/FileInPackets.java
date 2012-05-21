@@ -7,11 +7,8 @@ package org.ijs.vesna.otadebugger.gui;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.concurrent.Semaphore;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
-import javax.swing.JTextArea;
-import org.ijs.vesna.otadebugger.communicator.Comunicator;
 
 /**
  *
@@ -20,12 +17,12 @@ import org.ijs.vesna.otadebugger.communicator.Comunicator;
 public class FileInPackets {
 
     private static final int PACKET_SIZE = 512;
-    private static final int TIMEOUT = 30000; // transmission timeout in ms
-    private static final String CR_LF = "\r\n";
     private File otaImage;
     private long otaImageSize;
 
-    public ArrayList<byte[]> getOtaPackets() {
+    public ArrayList<byte[]> getOtaPackets(File file) {
+        this.otaImage = file;
+        otaImageSize = file.length();
         ArrayList<byte[]> otaPackets = new ArrayList<byte[]>();
         try {
             FileInputStream fin = new FileInputStream(otaImage);
@@ -46,10 +43,12 @@ public class FileInPackets {
                 // fill the last buffer with FFs
                 int packetsLen = otaPackets.size() * PACKET_SIZE;
                 int numOfFF = packetsLen - (int) otaImageSize;
-                for (int i = 0; i < numOfFF; i++) {
-                    byte[] lastPacket = otaPackets.get(otaPackets.size() - 1);
-                    lastPacket[(lastPacket.length - 1) - i] = (byte) 255;
-                    otaPackets.set(otaPackets.size() - 1, lastPacket);
+                if (numOfFF > 0) {
+                    for (int i = 0; i < numOfFF; i++) {
+                        byte[] lastPacket = otaPackets.get(otaPackets.size() - 1);
+                        lastPacket[(lastPacket.length - 1) - i] = (byte) 255;
+                        otaPackets.set(otaPackets.size() - 1, lastPacket);
+                    }
                 }
                 addPacketsHeader(otaPackets);
             } catch (Exception ex) {
