@@ -19,7 +19,6 @@ import java.util.zip.Checksum;
 public class FileInPackets {
 
     private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(FileInPackets.class);
-    
     private static final int PACKET_SIZE = 512;
     private File otaImage;
     private long otaImageSize;

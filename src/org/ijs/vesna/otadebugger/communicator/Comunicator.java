@@ -114,9 +114,9 @@ public class Comunicator {
                 semaphore.release();
             }
         } else {
-            receivedBuffer = "##ERROR: Communication in progress\n";
+            receivedBuffer = "ERROR: Communication in progress\n";
         }
-        return receivedBuffer + errorReport + "\n";
+        return receivedBuffer + errorReport + nl;
     }
 
     public String sendPost(String uri, byte[] content) {
@@ -174,7 +174,7 @@ public class Comunicator {
                 semaphore.release();
             }
         } else {
-            receivedBuffer = "##ERROR: Communication in progress\n";
+            receivedBuffer = "ERROR: Communication in progress\n";
         }
         return receivedBuffer + errorReport + "\n";
     }
@@ -224,10 +224,10 @@ public class Comunicator {
             int tmpBaud = Integer.valueOf(userBaudRate).intValue();
             baudRate = tmpBaud;
             if (open) {
-                returnMsg = "##Baud rate set to " + baudRate + ".\n"
-                        + "##Please close and reopen serial port.\n";
+                returnMsg = "Baud rate set to " + baudRate + ".\n"
+                        + "Please close and reopen serial port.\n";
             } else {
-                returnMsg = "##Baud rate set to " + baudRate + ".\n";
+                returnMsg = "Baud rate set to " + baudRate + ".\n";
             }
         } catch (Exception ex) {
             logger.error(ex);
@@ -241,7 +241,7 @@ public class Comunicator {
         String msg;
         portIdentifier = CommPortIdentifier.getPortIdentifier(portName);
         if (portIdentifier.isCurrentlyOwned()) {
-            msg = "##Error: Port is currently in use\n";
+            msg = "Error: Port is currently in use\n";
         } else {
             //create CommPort and identify available serial/parallel ports
             commPort = portIdentifier.open(this.getClass().getName(), 2000);
@@ -252,7 +252,7 @@ public class Comunicator {
             //start I/O streams
             inputStream = serialPort.getInputStream();
             outputStream = serialPort.getOutputStream();
-            msg = "##Serial port: " + portName + " is now opened.\n";
+            msg = "Serial port: " + portName + " is now opened.\n";
             open = true;
         }
         return msg;
@@ -281,12 +281,12 @@ public class Comunicator {
     public String setPortName(String portName) {
         String response;
         if (open) { //if port open, make user close port before changing port
-            response = "##Must Close Port Before Changing Port.\n";
+            response = "Must Close Port Before Changing Port.\n";
         } else if (portName.equals("Select Port")) {
-            response = "##Must Select Valid Port.\n";
+            response = "Must Select Valid Port.\n";
         } else {
             this.portName = portName;
-            response = "##Port Selected: " + portName + ", Baud Rate: " + baudRate + ".\n";
+            response = "Port Selected: " + portName + ", Baud Rate: " + baudRate + ".\n";
         }
         return response;
     }
@@ -321,7 +321,7 @@ public class Comunicator {
                     response = serialConnect(portName);
                     (new Thread(new SerialReader(inputStream))).start();
                 } else {
-                    response = "##Must Select Valid Port.\n";
+                    response = "Must Select Valid Port.\n";
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -354,7 +354,7 @@ public class Comunicator {
             if (serialPort != null) {
                 serialPort.close();
             }
-            response = "##Serial Port: " + portName + " is now closed.\n";
+            response = "Serial Port: " + portName + " is now closed.\n";
         }
         return response;
     }
@@ -383,7 +383,7 @@ public class Comunicator {
             if (serialPort != null) {
                 serialPort.close();
             }
-            response = "##Serial Port: " + portName + " is now closed.\n";
+            response = "Serial Port: " + portName + " is now closed.\n";
             portName = "";
             baudRate = 115200;
         }

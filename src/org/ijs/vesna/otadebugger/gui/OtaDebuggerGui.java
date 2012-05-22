@@ -4,15 +4,10 @@ package org.ijs.vesna.otadebugger.gui;
  * To change this template, choose Tools | Templates and open the template in
  * the editor.
  */
-import gnu.io.CommPort;
-import gnu.io.CommPortIdentifier;
-import gnu.io.SerialPort;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
@@ -47,7 +42,7 @@ public class OtaDebuggerGui extends javax.swing.JFrame {
 
         initComponents();
         //Display some instructions upon opening
-        outputText("##Select the port to which the SSL server will listen.\n");
+        outputText("Select the port to which the SSL server will listen.\n");
         comm = new Comunicator();
         fip = new FileInPackets();
         //Create a file chooser
@@ -404,10 +399,10 @@ public class OtaDebuggerGui extends javax.swing.JFrame {
                 (new SendGet()).execute();
                 getTextbar.selectAll();
             } else {
-                outputText("##Must input proper resource name.\n");
+                outputText("Must input proper resource name.\n");
             }
         } else {
-            outputText("##Must open connection first.\n");
+            outputText("Must open connection first.\n");
         }
 
     }//GEN-LAST:event_sendGetButtonActionPerformed
@@ -454,10 +449,10 @@ public class OtaDebuggerGui extends javax.swing.JFrame {
                 (new SendFirmware()).execute();
                 postContentTextField.selectAll();
             } else {
-                outputText("##Must input proper resource name.\n");
+                outputText("Must input proper resource name.\n");
             }
         } else {
-            outputText("##Must open connection first.\n");
+            outputText("Must open connection first.\n");
         }
     }//GEN-LAST:event_uploadButtonActionPerformed
 
@@ -479,8 +474,8 @@ public class OtaDebuggerGui extends javax.swing.JFrame {
                     logger.error(ex);
                 }
             } else {
-                outputText("##Selected file size is too large.\n");
-                outputText("##The maximum allowed size is one MB.\n");
+                outputText("Selected file size is too large.\n");
+                outputText("The maximum allowed size is one MB.\n");
                 firmwareTextField.setText("");
                 firmwareSizeNumLabel.setText("  ");
                 crcNumLabel.setText("  ");
@@ -495,7 +490,7 @@ public class OtaDebuggerGui extends javax.swing.JFrame {
 
     private void serialRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_serialRadioButtonActionPerformed
         clearButtonActionPerformed(evt);
-        outputText("##Select Port, Specify Baud Rate (default " + comm.getBaudRate() + "), Open Port.\n");
+        outputText("Select Port, Specify Baud Rate (default " + comm.getBaudRate() + "), Open Port.\n");
         if (comm.isOpen()) {
             String response = comm.sslDisconnect();
             outputText(response);
@@ -518,7 +513,7 @@ public class OtaDebuggerGui extends javax.swing.JFrame {
         clearButtonActionPerformed(evt);
         String res = comm.endSerialConnection();
         outputText(res);
-        outputText("##Select the port to which the SSL server will listen.\n");
+        outputText("Select the port to which the SSL server will listen.\n");
 
         portBox.setModel(new javax.swing.DefaultComboBoxModel());
 
@@ -555,13 +550,13 @@ public class OtaDebuggerGui extends javax.swing.JFrame {
                     (new SendPost()).execute();
                     postContentTextField.selectAll();
                 } else {
-                    outputText("##Must input proper content.\n");
+                    outputText("Must input proper content.\n");
                 }
             } else {
-                outputText("##Must input proper resource name.\n");
+                outputText("Must input proper resource name.\n");
             }
         } else {
-            outputText("##Must open connection first.\n");
+            outputText("Must open connection first.\n");
         }
     }//GEN-LAST:event_sendPostButtonActionPerformed
 
@@ -704,7 +699,7 @@ public class OtaDebuggerGui extends javax.swing.JFrame {
                     semaphore.release();
                 }
             } else {
-                outputText("##Must open connection first.\n");
+                outputText("Must open connection first.\n");
             }
             return response;
         }
