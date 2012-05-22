@@ -447,7 +447,7 @@ public class OtaDebuggerGui extends javax.swing.JFrame {
             if (postResourceTextField.getText() != null) {
                 firmwareResource = uriTextField.getText();
                 (new SendFirmware()).execute();
-                postContentTextField.selectAll();
+                uriTextField.selectAll();
             } else {
                 outputText("Must input proper resource name.\n");
             }
