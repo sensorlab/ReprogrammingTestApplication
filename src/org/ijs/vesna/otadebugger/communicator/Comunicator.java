@@ -414,9 +414,7 @@ public class Comunicator {
     }
 
     public class SslServer implements Runnable {
-
-        //private InputStream inputStream;
-        //private OutputStream outputStream;
+        
         private int port;
         private boolean runServer = true;
 
