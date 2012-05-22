@@ -4,7 +4,9 @@ package org.ijs.vesna.otadebugger.gui;
  * To change this template, choose Tools | Templates and open the template in
  * the editor.
  */
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.zip.CRC32;
@@ -16,6 +18,8 @@ import java.util.zip.Checksum;
  */
 public class FileInPackets {
 
+    private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(FileInPackets.class);
+    
     private static final int PACKET_SIZE = 512;
     private File otaImage;
     private long otaImageSize;
@@ -29,7 +33,7 @@ public class FileInPackets {
             try {
                 byte[] packetBuffer = new byte[PACKET_SIZE];
                 int countBytes = 0;
-                int b = 0;
+                int b;
                 while ((b = fin.read()) != -1) {
                     packetBuffer[countBytes++] = (byte) b;
                     if (countBytes == PACKET_SIZE) {
@@ -52,12 +56,12 @@ public class FileInPackets {
                 }
                 addPacketsHeader(otaPackets);
             } catch (Exception ex) {
-                ex.printStackTrace();
+                logger.error(ex);
             } finally {
                 fin.close();
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            logger.error(ex);
         }
         return otaPackets;
     }

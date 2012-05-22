@@ -4,21 +4,26 @@
  */
 package org.ijs.vesna.otadebugger.communicator;
 
-import gnu.io.*;
-import java.io.*;
-import java.nio.ByteBuffer;
+import gnu.io.CommPort;
+import gnu.io.CommPortIdentifier;
+import gnu.io.SerialPort;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.Enumeration;
 import java.util.concurrent.Semaphore;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
+import javax.net.ssl.SSLServerSocketFactory;
 import org.apache.log4j.Logger;
-import org.ijs.vesna.sslserver.SslDataListener;
 
 /**
  *
  * @author Matevz
  */
-public class Comunicator implements SslDataListener {
+public class Comunicator {
     //constants
 
     private static final String nl = "\n";
@@ -34,6 +39,7 @@ public class Comunicator implements SslDataListener {
     private static final int SEMAPHORE = 1;
     private static final int MAX_PORTS = 20;
     private static final int MAX_RETRANSMISSIONS = 10;
+    private static final String CLOSING_STRING = "closesslsocket\r\n";
     private static final Logger logger = Logger.getLogger(Comunicator.class);
     private InputStream inputStream;
     private OutputStream outputStream;
@@ -45,6 +51,9 @@ public class Comunicator implements SslDataListener {
     private CommPort commPort;
     private SerialPort serialPort;
     private String portName = "";
+
+    public Comunicator() {
+    }
 
     public String getPortName() {
         return portName;
@@ -59,9 +68,6 @@ public class Comunicator implements SslDataListener {
 
     public int getBaudRate() {
         return baudRate;
-    }
-
-    public Comunicator() {
     }
 
     public String sendGet(byte[] params) {
@@ -174,7 +180,6 @@ public class Comunicator implements SslDataListener {
     }
 
     private void sendRecoveryRequest() {
-        //if (semaphore.tryAcquire()) {
         try {
             String req = CR_LF;
 
@@ -191,9 +196,26 @@ public class Comunicator implements SslDataListener {
             }
         } catch (Exception ex) {
             logger.error(ex);
-        } finally {
-            semaphore.release();
-        }        
+        }
+    }
+
+    public String sslConnect(int port) {
+        try {
+            SslServer sslServer = new SslServer(port);
+            (new Thread(sslServer)).start();
+            return "SSL server listening on port " + port + nl;
+        } catch (Exception ex) {
+            return "SSL server setup failed\n";
+        }
+    }
+
+    public String sslDisconnect() {
+        try {
+            outputStream.write(CLOSING_STRING.getBytes());
+            return "SSL server closed\n";
+        } catch (Exception ex) {
+            return "Closing SSL server failed\n";
+        }
     }
 
     public String setBaudRate(String userBaudRate) {
@@ -214,9 +236,9 @@ public class Comunicator implements SslDataListener {
     }
 
     //open serial port
-    private String connect(String portName) throws Exception {
+    private String serialConnect(String portName) throws Exception {
         //make sure port is not currently in use
-        String msg = "";
+        String msg;
         portIdentifier = CommPortIdentifier.getPortIdentifier(portName);
         if (portIdentifier.isCurrentlyOwned()) {
             msg = "##Error: Port is currently in use\n";
@@ -257,7 +279,7 @@ public class Comunicator implements SslDataListener {
     }
 
     public String setPortName(String portName) {
-        String response = "";
+        String response;
         if (open) { //if port open, make user close port before changing port
             response = "##Must Close Port Before Changing Port.\n";
         } else if (portName.equals("Select Port")) {
@@ -277,7 +299,7 @@ public class Comunicator implements SslDataListener {
                 try {
                     inputStream.close();
                 } catch (IOException ex) {
-                    ex.printStackTrace();
+                    logger.error(ex);
                 }
             }
             //close output stream
@@ -285,7 +307,7 @@ public class Comunicator implements SslDataListener {
                 try {
                     outputStream.close();
                 } catch (IOException ex) {
-                    ex.printStackTrace();
+                    logger.error(ex);
                 }
             }
             //close serial port                   
@@ -296,7 +318,7 @@ public class Comunicator implements SslDataListener {
         } else {//else port is closed, so open it
             try {
                 if (!portName.equals("")) {
-                    response = connect(portName);
+                    response = serialConnect(portName);
                     (new Thread(new SerialReader(inputStream))).start();
                 } else {
                     response = "##Must Select Valid Port.\n";
@@ -318,7 +340,7 @@ public class Comunicator implements SslDataListener {
                 try {
                     inputStream.close();
                 } catch (IOException ex) {
-                    ex.printStackTrace();
+                    logger.error(ex);
                 }
             }
             if (outputStream != null) //close output stream
@@ -326,13 +348,13 @@ public class Comunicator implements SslDataListener {
                 try {
                     outputStream.close();
                 } catch (IOException ex) {
-                    ex.printStackTrace();
+                    logger.error(ex);
                 }
             }
             if (serialPort != null) {
                 serialPort.close();
             }
-            response = "##Serial Port: " + portName + " is now closed.\n";            
+            response = "##Serial Port: " + portName + " is now closed.\n";
         }
         return response;
     }
@@ -340,14 +362,14 @@ public class Comunicator implements SslDataListener {
     public String endSerialConnection() {
         //when user closes, make sure to close open ports and open I/O streams
         String response = "";
-        if (portIdentifier.isCurrentlyOwned()) { //if port open, close port
+        if (portIdentifier != null && portIdentifier.isCurrentlyOwned()) { //if port open, close port
             open = false;
             if (inputStream != null) //close input stream
             {
                 try {
                     inputStream.close();
                 } catch (IOException ex) {
-                    ex.printStackTrace();
+                    logger.error(ex);
                 }
             }
             if (outputStream != null) //close output stream
@@ -355,7 +377,7 @@ public class Comunicator implements SslDataListener {
                 try {
                     outputStream.close();
                 } catch (IOException ex) {
-                    ex.printStackTrace();
+                    logger.error(ex);
                 }
             }
             if (serialPort != null) {
@@ -367,12 +389,6 @@ public class Comunicator implements SslDataListener {
         }
         return response;
     }
-    
-    private long calculateCrc(byte[] b) {
-        Checksum checksum = new CRC32();
-        checksum.update(b, 0, b.length);
-        return checksum.getValue();
-    }
 
     public class SerialReader implements Runnable {
 
@@ -382,22 +398,97 @@ public class Comunicator implements SslDataListener {
             this.in = in;
         }
 
+        @Override
         public void run() {
             byte[] buffer = new byte[1024];
-            int len = -1;
+            int len;
             try {
                 while ((len = this.in.read(buffer)) > -1 && open) {
                     receivedBuffer += new String(buffer, 0, len);
                 }
                 in.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error(e);
             }
         }
     }
 
-    @Override
-    public void notifySslDataListener(String str) {
-        receivedBuffer += str;
+    public class SslServer implements Runnable {
+
+        //private InputStream inputStream;
+        //private OutputStream outputStream;
+        private int port;
+        private boolean runServer = true;
+
+        public SslServer(int port) {
+            this.port = port;
+        }
+
+        @Override
+        public void run() {
+            try {
+                System.setProperty("javax.net.ssl.keyStore", "mySrvKeystore");
+                System.setProperty("javax.net.ssl.keyStorePassword", "123456");
+                SSLServerSocketFactory ssf = null;
+                ServerSocket ss = null;
+                try {
+                    ssf = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
+                    ss = ssf.createServerSocket(port);
+                    logger.debug("The SSL Server is listening on port " + ss.getLocalPort());
+
+                    while (runServer) {
+                        try {
+                            Socket s = null;
+                            try {
+                                logger.debug("Waiting for client connection.");
+                                s = ss.accept();
+                                logger.debug("Client with IP "
+                                        + s.getInetAddress().getHostAddress()
+                                        + " successfully connected to the server.");
+
+                                inputStream = s.getInputStream();
+
+                                outputStream = s.getOutputStream();
+
+                                open = true;
+
+                                byte[] buffer = new byte[1024];
+                                int len;
+                                try {
+                                    while ((len = inputStream.read(buffer)) > -1 && open) {
+                                        String recBuff = new String(buffer, 0, len);
+                                        if (recBuff.contains(CLOSING_STRING)) {
+                                            runServer = false;
+                                            break;
+                                        }
+                                        receivedBuffer += new String(buffer, 0, len) + "\r\nOK\r\n";
+                                    }
+                                } catch (IOException e) {
+                                    logger.error(e);
+                                }
+                                logger.debug("The SSL Socket is now closed.");
+                            } catch (Exception ex) {
+                                logger.error("The SSL Socket was closed unexpectedly.");
+                                logger.error(ex);
+                            } finally {
+                                open = false;
+                                inputStream.close();
+                                inputStream.close();
+                                s.close();
+                            }
+                        } catch (Exception ex) {
+                            logger.error(ex);
+                        }
+                    }
+                    logger.debug("The SSL Server shutted down.");
+                } catch (Exception ex) {
+                    logger.error(ex);
+                } finally {
+                    ss.close();
+                }
+            } catch (Exception ex) {
+                logger.error(ex);
+            }
+        }
     }
 }
