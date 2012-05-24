@@ -52,7 +52,7 @@ public class OtaDebuggerGui extends javax.swing.JFrame {
     @Override
     public List<Image> getIconImages() {
         ArrayList<Image> imageList = new ArrayList<Image>();
-        imageList.add(Toolkit.getDefaultToolkit().getImage(OtaDebuggerGui.class.getResource("../../logo/SensorLab-Logo.png")));
+        imageList.add(Toolkit.getDefaultToolkit().getImage(OtaDebuggerGui.class.getResource("/org/ijs/vesna/logo/SensorLab-Logo.png")));
         return imageList;
     }
 

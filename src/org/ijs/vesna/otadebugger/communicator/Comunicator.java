@@ -36,15 +36,14 @@ public class Comunicator {
     private static final String JUNK_INPUT = "\r\nJUNK-INPUT\r\n";
     private static final String CORRUPTED_DATA = "\r\nCORRUPTED-DATA\r\n";
     private static final String ERROR = "\r\nERROR\r\n";
+    private static final String REBOOT_RESOURCE = "prog/doRestart";
     private static final int SEMAPHORE = 1;
     private static final int MAX_PORTS = 20;
     private static final int MAX_RETRANSMISSIONS = 10;
     private static final String CLOSING_STRING = "closesslsocket\r\n";
     private static final Logger logger = Logger.getLogger(Comunicator.class);
     private InputStream inputStream;
-    private OutputStream outputStream;
-    //private BufferedReader reader = null;
-    //private BufferedWriter writer = null;
+    private OutputStream outputStream;    
     private String receivedBuffer = "";
     private final Semaphore semaphore = new Semaphore(SEMAPHORE, true);
     private String[] tempPortList, portList; //list of ports for combobox dropdown
@@ -119,12 +118,12 @@ public class Comunicator {
         return receivedBuffer + errorReport + nl;
     }
 
-    public String sendPost(String uri, byte[] content) {
+    public String sendPost(String params, byte[] content) {
         String errorReport = "";
         if (semaphore.tryAcquire()) {
             try {
                 for (int i = 0; i < MAX_RETRANSMISSIONS; i++) {
-                    String reqBegin = POST + uri + CR_LF
+                    String reqBegin = POST + params + CR_LF
                             + LEN + content.length + CR_LF;
 
                     Checksum checksum = new CRC32();
@@ -140,7 +139,7 @@ public class Comunicator {
                     outputStream.write(reqEnd.getBytes());
 
                     receivedBuffer = "";
-                    while (!receivedBuffer.contains(RESPONSE_END) && open) {
+                    while (!receivedBuffer.contains(RESPONSE_END) && open && !params.equals(REBOOT_RESOURCE)) {
                         try {
                             Thread.sleep(1);
                         } catch (InterruptedException ignore) {
@@ -414,7 +413,7 @@ public class Comunicator {
     }
 
     public class SslServer implements Runnable {
-        
+
         private int port;
         private boolean runServer = true;
 
