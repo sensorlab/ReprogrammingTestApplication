@@ -25,7 +25,6 @@ import org.apache.log4j.Logger;
  */
 public class Comunicator {
     //constants
-
     private static final String nl = "\n";
     private static final String CR_LF = "\r\n";
     private static final String GET = "GET ";
@@ -41,6 +40,7 @@ public class Comunicator {
     private static final int MAX_PORTS = 20;
     private static final int MAX_RETRANSMISSIONS = 10;
     private static final String CLOSING_STRING = "closesslsocket\r\n";
+    
     private static final Logger logger = Logger.getLogger(Comunicator.class);
     private InputStream inputStream;
     private OutputStream outputStream;    
