@@ -6,6 +6,7 @@ package org.ijs.vesna.otadebugger.communicator;
 
 import gnu.io.CommPort;
 import gnu.io.CommPortIdentifier;
+import gnu.io.CommPortOwnershipListener;
 import gnu.io.SerialPort;
 import java.io.IOException;
 import java.io.InputStream;
@@ -137,9 +138,14 @@ public class Comunicator {
                     outputStream.write(content);
                     outputStream.write(CR_LF.getBytes());
                     outputStream.write(reqEnd.getBytes());
+                    
+                    if(params.equals(REBOOT_RESOURCE)) {
+                        receivedBuffer = "node restarting...";
+                        return receivedBuffer;
+                    }
 
                     receivedBuffer = "";
-                    while (!receivedBuffer.contains(RESPONSE_END) && open && !params.equals(REBOOT_RESOURCE)) {
+                    while (!receivedBuffer.contains(RESPONSE_END) && open) {
                         try {
                             Thread.sleep(1);
                         } catch (InterruptedException ignore) {
