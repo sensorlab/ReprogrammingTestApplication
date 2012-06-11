@@ -406,10 +406,28 @@ public class Comunicator {
         @Override
         public void run() {
             byte[] buffer = new byte[1024];
+            Integer lockInt = new Integer(0);
             int len;
+            int avail;
             try {
-                while ((len = this.in.read(buffer)) > -1 && open) {
-                    receivedBuffer += new String(buffer, 0, len);
+                while (open){
+                    /*
+                     * we do not want to block, in order to be able to
+                     * close the serial line
+                     */
+                    avail = this.in.available();
+                    if(avail > 0){
+                        len = this.in.read(buffer, 0, avail);
+                        receivedBuffer += new String(buffer, 0, len);
+                    }
+                    // wait a little
+                    synchronized(lockInt){
+                        try {
+                            lockInt.wait(10);
+                        } catch(InterruptedException e){
+                            // whatever...
+                        }
+                    }
                 }
                 in.close();
             } catch (IOException e) {
