@@ -658,7 +658,7 @@ public class OtaDebuggerGui extends javax.swing.JFrame {
         protected String doInBackground() throws Exception {
             outputText(">>" + resource + "\n");
             outputText(">>" + postMsg + "\n\n");
-            return comm.sendPost(resource, postMsg.getBytes());
+            return comm.sendPost(resource.getBytes(), postMsg.getBytes());
         }
 
         @Override
@@ -684,7 +684,7 @@ public class OtaDebuggerGui extends javax.swing.JFrame {
                 try {
                     ArrayList<byte[]> firmware = fip.getOtaPackets(file);
                     for (int i = 0; i < firmware.size(); i++) {
-                        response = comm.sendPost(firmwareResource, firmware.get(i));
+                        response = comm.sendPost(firmwareResource.getBytes(), firmware.get(i));
                         publish(response);
 
                         if (!comm.isOpen()) {
