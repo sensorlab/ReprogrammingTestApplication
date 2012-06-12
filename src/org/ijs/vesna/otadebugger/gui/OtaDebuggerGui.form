@@ -47,7 +47,7 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="uriTextField" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="uploadButton" min="-2" max="-2" attributes="0"/>
+                      <Component id="uploadButton" min="-2" pref="200" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="1" attributes="0">
                       <Component id="baudTextField" linkSize="1" min="-2" pref="65" max="-2" attributes="1"/>
@@ -73,13 +73,13 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="postContentLabel" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="-2" max="-2" attributes="0"/>
-                              <Component id="postContentTextField" pref="107" max="32767" attributes="0"/>
+                              <Component id="postContentTextField" pref="71" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" max="-2" attributes="0">
                           <Component id="sendPostButton" linkSize="3" alignment="1" max="32767" attributes="0"/>
-                          <Component id="sendGetButton" linkSize="3" alignment="1" pref="114" max="32767" attributes="0"/>
+                          <Component id="sendGetButton" linkSize="3" alignment="1" pref="150" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                   <Component id="jSeparator3" alignment="0" max="32767" attributes="0"/>
