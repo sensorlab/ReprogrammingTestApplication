@@ -237,6 +237,7 @@ public class Comunicator {
         try {
             SslServer sslServer = new SslServer(port);
             (new Thread(sslServer)).start();
+            open = true;
             return "SSL server listening on port " + port + nl;
         } catch (Exception ex) {
             return "SSL server setup failed" + nl;
@@ -246,8 +247,9 @@ public class Comunicator {
     public String sslDisconnect() {
         String res = "";
         try {
-            res = sendPost(CLOSING_STRING.getBytes(), CLOSING_STRING.getBytes());
-            return res + "\nSSL server closed" + nl;
+            //res = sendPost(CLOSING_STRING.getBytes(), CLOSING_STRING.getBytes());
+            open = false;
+            return "\nSSL server closed" + nl;
         } catch (Exception ex) {
             return "Closing SSL server failed" + nl;
         }
@@ -505,14 +507,32 @@ public class Comunicator {
 
                                 byte[] buffer = new byte[1024];
                                 int len;
+                                int avail;
+                                Integer lockInt = new Integer(0);
+                                /*
+                                 * we do not want to block, in order to be able to
+                                 * close the serial line
+                                 */
                                 try {
-                                    while ((len = inputStream.read(buffer)) > -1 && open) {
-                                        String recBuff = new String(buffer, 0, len);
-                                        if (recBuff.contains(CLOSING_STRING)) {
-                                            runServer = false;
-                                            break;
+                                    while (open) {
+                                        avail = inputStream.available();
+                                        if(avail > 0){
+                                            len = inputStream.read(buffer, 0, avail);
+                                            String recBuff = new String(buffer, 0, len);
+                                            if (recBuff.contains(CLOSING_STRING)) {
+                                                runServer = false;
+                                                break;
+                                            }
+                                            receivedBuffer += new String(buffer, 0, len);
                                         }
-                                        receivedBuffer += new String(buffer, 0, len);
+                                        // wait a little
+                                        synchronized(lockInt){
+                                            try {
+                                                lockInt.wait(10);
+                                            } catch(InterruptedException e){
+                                                // whatever...
+                                            }
+                                        }
                                     }
                                 } catch (IOException e) {
                                     logger.error(e);
