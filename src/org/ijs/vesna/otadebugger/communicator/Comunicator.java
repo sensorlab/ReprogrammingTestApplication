@@ -233,11 +233,13 @@ public class Comunicator {
         }
     }
 
+    private SslServer sslServer = null;
+
     public String sslConnect(int port) {
         try {
-            SslServer sslServer = new SslServer(port);
+            sslServer = new SslServer(port);
             (new Thread(sslServer)).start();
-            open = true;
+            // open = true;
             return "SSL server listening on port " + port + nl;
         } catch (Exception ex) {
             return "SSL server setup failed" + nl;
@@ -248,7 +250,8 @@ public class Comunicator {
         String res = "";
         try {
             //res = sendPost(CLOSING_STRING.getBytes(), CLOSING_STRING.getBytes());
-            open = false;
+            // open = false;
+            sslServer.forceClose();
             return "\nSSL server closed" + nl;
         } catch (Exception ex) {
             return "Closing SSL server failed" + nl;
@@ -477,6 +480,18 @@ public class Comunicator {
             this.port = port;
         }
 
+        private Socket s = null;
+
+        public void forceClose(){
+            if(s != null){
+                try {
+                    s.close();
+                } catch(IOException e){
+                    logger.error(e);
+                }
+            }
+        }
+
         @Override
         public void run() {
             try {
@@ -491,7 +506,7 @@ public class Comunicator {
 
                     while (runServer) {
                         try {
-                            Socket s = null;
+
                             try {
                                 logger.debug("Waiting for client connection.");
                                 s = ss.accept();
@@ -507,32 +522,15 @@ public class Comunicator {
 
                                 byte[] buffer = new byte[1024];
                                 int len;
-                                int avail;
-                                Integer lockInt = new Integer(0);
-                                /*
-                                 * we do not want to block, in order to be able to
-                                 * close the serial line
-                                 */
                                 try {
                                     while (open) {
-                                        avail = inputStream.available();
-                                        if(avail > 0){
-                                            len = inputStream.read(buffer, 0, avail);
-                                            String recBuff = new String(buffer, 0, len);
-                                            if (recBuff.contains(CLOSING_STRING)) {
-                                                runServer = false;
-                                                break;
-                                            }
-                                            receivedBuffer += new String(buffer, 0, len);
+                                        len = inputStream.read(buffer);
+                                        String recBuff = new String(buffer, 0, len);
+                                        if (recBuff.contains(CLOSING_STRING)) {
+                                            runServer = false;
+                                            break;
                                         }
-                                        // wait a little
-                                        synchronized(lockInt){
-                                            try {
-                                                lockInt.wait(10);
-                                            } catch(InterruptedException e){
-                                                // whatever...
-                                            }
-                                        }
+                                        receivedBuffer += new String(buffer, 0, len);
                                     }
                                 } catch (IOException e) {
                                     logger.error(e);
