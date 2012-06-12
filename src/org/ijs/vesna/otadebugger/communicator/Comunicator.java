@@ -252,9 +252,9 @@ public class Comunicator {
             //res = sendPost(CLOSING_STRING.getBytes(), CLOSING_STRING.getBytes());
             // open = false;
             sslServer.forceClose();
-            return "\nSSL server closed" + nl;
+            return "\nSSL reseted" + nl;
         } catch (Exception ex) {
-            return "Closing SSL server failed" + nl;
+            return "Reseting SSL failed" + nl;
         }
     }
 
