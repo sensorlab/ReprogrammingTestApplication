@@ -505,14 +505,32 @@ public class Comunicator {
 
                                 byte[] buffer = new byte[1024];
                                 int len;
+                                int avail;
+                                Integer lockInt = new Integer(0);
+                                /*
+                                 * we do not want to block, in order to be able to
+                                 * close the serial line
+                                 */
                                 try {
-                                    while ((len = inputStream.read(buffer)) > -1 && open) {
-                                        String recBuff = new String(buffer, 0, len);
-                                        if (recBuff.contains(CLOSING_STRING)) {
-                                            runServer = false;
-                                            break;
+                                    while (open) {
+                                        avail = inputStream.available();
+                                        if(avail > 0){
+                                            len = inputStream.read(buffer, 0, avail);
+                                            String recBuff = new String(buffer, 0, len);
+                                            if (recBuff.contains(CLOSING_STRING)) {
+                                                runServer = false;
+                                                break;
+                                            }
+                                            receivedBuffer += new String(buffer, 0, len);
                                         }
-                                        receivedBuffer += new String(buffer, 0, len);
+                                        // wait a little
+                                        synchronized(lockInt){
+                                            try {
+                                                lockInt.wait(10);
+                                            } catch(InterruptedException e){
+                                                // whatever...
+                                            }
+                                        }
                                     }
                                 } catch (IOException e) {
                                     logger.error(e);
