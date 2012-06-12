@@ -60,3 +60,6 @@
 2012-06-11 17:34:13,260 [Thread-4] DEBUG Comunicator - The SSL Socket is now closed.
 2012-06-11 17:34:13,265 [Thread-4] DEBUG Comunicator - Waiting for client connection.
 2012-06-11 17:34:13,265 [Thread-4] DEBUG Comunicator - Client with IP 194.249.231.117 successfully connected to the server.
+2012-06-11 18:40:32,712 [Thread-4] ERROR Comunicator - java.net.SocketTimeoutException: Read timed out
+2012-06-11 18:40:32,712 [Thread-4] DEBUG Comunicator - The SSL Socket is now closed.
+2012-06-11 18:40:32,712 [Thread-4] DEBUG Comunicator - Waiting for client connection.

@@ -237,6 +237,7 @@ public class Comunicator {
         try {
             SslServer sslServer = new SslServer(port);
             (new Thread(sslServer)).start();
+            open = true;
             return "SSL server listening on port " + port + nl;
         } catch (Exception ex) {
             return "SSL server setup failed" + nl;
@@ -246,8 +247,9 @@ public class Comunicator {
     public String sslDisconnect() {
         String res = "";
         try {
-            res = sendPost(CLOSING_STRING.getBytes(), CLOSING_STRING.getBytes());
-            return res + "\nSSL server closed" + nl;
+            //res = sendPost(CLOSING_STRING.getBytes(), CLOSING_STRING.getBytes());
+            open = false;
+            return "\nSSL server closed" + nl;
         } catch (Exception ex) {
             return "Closing SSL server failed" + nl;
         }
