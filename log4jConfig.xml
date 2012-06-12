@@ -20,7 +20,7 @@
     </appender>
 
     <root>
-        <priority value ="info" />
+        <priority value ="debug" />
         <!-- <appender-ref ref="console" /> -->        
         <appender-ref ref="rolling-file" />
         <appender-ref ref="console" />

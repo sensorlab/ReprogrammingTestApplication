@@ -1,4 +1,4 @@
-/*
+ /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
@@ -6,7 +6,6 @@ package org.ijs.vesna.otadebugger.communicator;
 
 import gnu.io.CommPort;
 import gnu.io.CommPortIdentifier;
-import gnu.io.CommPortOwnershipListener;
 import gnu.io.SerialPort;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,6 +25,7 @@ import org.apache.log4j.Logger;
  */
 public class Comunicator {
     //constants
+
     private static final String nl = "\n";
     private static final String CR_LF = "\r\n";
     private static final String GET = "GET ";
@@ -39,27 +39,25 @@ public class Comunicator {
     private static final String REBOOT_RESOURCE = "prog/doRestart";
     private static final int SEMAPHORE = 1;
     private static final int MAX_PORTS = 20;
-    private static final int MAX_RETRANSMISSIONS = 10;
+    private static final int MAX_RETRANSMISSIONS = 1;
     private static final String CLOSING_STRING = "closesslsocket\r\n";
-    
+    private static final int TIMEOUT = 10000; // transmission timeout in ms
+    private static final int MASTER_TIMEOUT = 60000; // transmission timeout in ms
     private static final Logger logger = Logger.getLogger(Comunicator.class);
     private InputStream inputStream;
-    private OutputStream outputStream;    
+    private OutputStream outputStream;
     private String receivedBuffer = "";
     private final Semaphore semaphore = new Semaphore(SEMAPHORE, true);
     private String[] tempPortList, portList; //list of ports for combobox dropdown
     private CommPort commPort;
     private SerialPort serialPort;
     private String portName = "";
-
-    public Comunicator() {
-    }
+    private CommPortIdentifier portIdentifier = null;
+    private boolean open = false;
 
     public String getPortName() {
         return portName;
     }
-    private CommPortIdentifier portIdentifier = null;
-    private boolean open = false;
 
     public boolean isOpen() {
         return open;
@@ -71,6 +69,7 @@ public class Comunicator {
     }
 
     public String sendGet(byte[] params) {
+        //TODO implement timeout
         String errorReport = "";
         if (semaphore.tryAcquire()) {
             try {
@@ -79,8 +78,19 @@ public class Comunicator {
                     outputStream.write(params);
                     outputStream.write(CR_LF.getBytes());
 
+                    long startMaster = System.currentTimeMillis();
+                    long start = System.currentTimeMillis();
+                    String tmpBuff = "tmp";
                     receivedBuffer = "";
                     while (!receivedBuffer.contains(RESPONSE_END) && open) {
+                        if (!receivedBuffer.equals(tmpBuff)) {
+                            start = System.currentTimeMillis();
+                        }
+                        long stop = System.currentTimeMillis();
+                        if ((stop - start) > TIMEOUT || (stop - startMaster) > MASTER_TIMEOUT) {
+                            return receivedBuffer + nl + "Fatal Error: Response Timeout" + nl + nl;
+                        }
+                        tmpBuff = receivedBuffer;
                         try {
                             Thread.sleep(1);
                         } catch (InterruptedException ignore) {
@@ -116,36 +126,55 @@ public class Comunicator {
         } else {
             receivedBuffer = "ERROR: Communication in progress\n";
         }
-        return receivedBuffer + errorReport + nl;
+        return receivedBuffer + nl + errorReport + nl;
     }
 
-    public String sendPost(String params, byte[] content) {
+    public String sendPost(byte[] params, byte[] content) {
+        //TODO implement timeout
+        String strParams = new String(params);
         String errorReport = "";
         if (semaphore.tryAcquire()) {
             try {
                 for (int i = 0; i < MAX_RETRANSMISSIONS; i++) {
-                    String reqBegin = POST + params + CR_LF
-                            + LEN + content.length + CR_LF;
+
+                    String len = LEN + content.length + CR_LF;
 
                     Checksum checksum = new CRC32();
-                    checksum.update(reqBegin.getBytes(), 0, reqBegin.getBytes().length);
+                    checksum.update(POST.getBytes(), 0, POST.getBytes().length);
+                    checksum.update(params, 0, params.length);
+                    checksum.update(CR_LF.getBytes(), 0, CR_LF.getBytes().length);
+                    checksum.update(len.getBytes(), 0, len.getBytes().length);
                     checksum.update(content, 0, content.length);
                     checksum.update(CR_LF.getBytes(), 0, CR_LF.getBytes().length);
 
                     String reqEnd = CRC + checksum.getValue() + CR_LF;
 
-                    outputStream.write(reqBegin.getBytes());
+                    outputStream.write(POST.getBytes());
+                    outputStream.write(params);
+                    outputStream.write(CR_LF.getBytes());
+                    outputStream.write(len.getBytes());
                     outputStream.write(content);
                     outputStream.write(CR_LF.getBytes());
                     outputStream.write(reqEnd.getBytes());
-                    
-                    if(params.equals(REBOOT_RESOURCE)) {
-                        receivedBuffer = "node restarting...";
+
+                    if (strParams.equals(REBOOT_RESOURCE)) {
+                        receivedBuffer = "node restarting..." + nl;
                         return receivedBuffer;
                     }
 
+                    long startMaster = System.currentTimeMillis();
+                    long start = System.currentTimeMillis();
+                    String tmpBuff = "tmp";
                     receivedBuffer = "";
                     while (!receivedBuffer.contains(RESPONSE_END) && open) {
+                        if (!receivedBuffer.equals(tmpBuff)) {
+                            start = System.currentTimeMillis();
+                        }
+                        long stop = System.currentTimeMillis();
+                        if ((stop - start) > TIMEOUT || (stop - startMaster) > MASTER_TIMEOUT) {
+                            return receivedBuffer + nl + "Fatal Error: Response Timeout" + nl + nl;
+                        }
+                        tmpBuff = receivedBuffer;
                         try {
                             Thread.sleep(1);
                         } catch (InterruptedException ignore) {
@@ -210,16 +239,17 @@ public class Comunicator {
             (new Thread(sslServer)).start();
             return "SSL server listening on port " + port + nl;
         } catch (Exception ex) {
-            return "SSL server setup failed\n";
+            return "SSL server setup failed" + nl;
         }
     }
 
     public String sslDisconnect() {
+        String res = "";
         try {
-            outputStream.write(CLOSING_STRING.getBytes());
-            return "SSL server closed\n";
+            res = sendPost(CLOSING_STRING.getBytes(), CLOSING_STRING.getBytes());
+            return res + "\nSSL server closed" + nl;
         } catch (Exception ex) {
-            return "Closing SSL server failed\n";
+            return "Closing SSL server failed" + nl;
         }
     }
 
@@ -482,7 +512,7 @@ public class Comunicator {
                                             runServer = false;
                                             break;
                                         }
-                                        receivedBuffer += new String(buffer, 0, len) + "\r\nOK\r\n";
+                                        receivedBuffer += new String(buffer, 0, len);
                                     }
                                 } catch (IOException e) {
                                     logger.error(e);

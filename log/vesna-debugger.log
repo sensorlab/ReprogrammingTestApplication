@@ -1,0 +1,62 @@
+2012-06-11 11:07:03,988 [Thread-4] DEBUG Comunicator - The SSL Server is listening on port 9999
+2012-06-11 11:07:06,700 [Thread-4] DEBUG Comunicator - Waiting for client connection.
+2012-06-11 11:07:16,921 [Thread-4] DEBUG Comunicator - Client with IP 194.249.231.117 successfully connected to the server.
+2012-06-11 11:08:14,918 [Thread-4] ERROR Comunicator - java.net.SocketException: Connection reset
+2012-06-11 11:08:14,918 [Thread-4] DEBUG Comunicator - The SSL Socket is now closed.
+2012-06-11 11:08:49,712 [Thread-4] DEBUG Comunicator - Waiting for client connection.
+2012-06-11 11:08:49,712 [Thread-4] DEBUG Comunicator - Client with IP 169.254.185.163 successfully connected to the server.
+2012-06-11 11:08:49,714 [Thread-4] ERROR Comunicator - javax.net.ssl.SSLHandshakeException: Remote host closed connection during handshake
+2012-06-11 11:08:49,714 [Thread-4] DEBUG Comunicator - The SSL Socket is now closed.
+2012-06-11 11:08:49,714 [Thread-4] DEBUG Comunicator - Waiting for client connection.
+2012-06-11 11:08:49,715 [Thread-4] DEBUG Comunicator - Client with IP 194.249.231.117 successfully connected to the server.
+2012-06-11 11:18:00,435 [Thread-4] DEBUG Comunicator - The SSL Server is listening on port 9999
+2012-06-11 11:18:00,435 [Thread-4] DEBUG Comunicator - Waiting for client connection.
+2012-06-11 11:18:05,396 [Thread-4] DEBUG Comunicator - Client with IP 169.254.185.163 successfully connected to the server.
+2012-06-11 11:18:09,155 [Thread-4] DEBUG Comunicator - The SSL Socket is now closed.
+2012-06-11 11:18:09,156 [Thread-4] DEBUG Comunicator - Waiting for client connection.
+2012-06-11 11:18:09,189 [Thread-4] DEBUG Comunicator - Client with IP 194.249.231.117 successfully connected to the server.
+2012-06-11 11:26:13,642 [Thread-4] ERROR Comunicator - java.net.SocketException: Connection reset
+2012-06-11 11:26:13,642 [Thread-4] DEBUG Comunicator - The SSL Socket is now closed.
+2012-06-11 11:26:13,642 [Thread-4] DEBUG Comunicator - Waiting for client connection.
+2012-06-11 11:26:13,643 [Thread-4] DEBUG Comunicator - Client with IP 169.254.185.163 successfully connected to the server.
+2012-06-11 11:26:13,646 [Thread-4] ERROR Comunicator - javax.net.ssl.SSLHandshakeException: Remote host closed connection during handshake
+2012-06-11 11:26:13,646 [Thread-4] DEBUG Comunicator - The SSL Socket is now closed.
+2012-06-11 11:26:13,649 [Thread-4] DEBUG Comunicator - Waiting for client connection.
+2012-06-11 11:26:13,649 [Thread-4] DEBUG Comunicator - Client with IP 194.249.231.117 successfully connected to the server.
+2012-06-11 11:28:14,101 [Thread-4] DEBUG Comunicator - The SSL Server is listening on port 9999
+2012-06-11 11:28:14,101 [Thread-4] DEBUG Comunicator - Waiting for client connection.
+2012-06-11 11:28:15,540 [Thread-4] DEBUG Comunicator - Client with IP 194.249.231.117 successfully connected to the server.
+2012-06-11 11:30:52,204 [Thread-4] DEBUG Comunicator - The SSL Socket is now closed.
+2012-06-11 11:30:52,206 [Thread-4] DEBUG Comunicator - The SSL Server shutted down.
+2012-06-11 11:31:22,183 [Thread-4] DEBUG Comunicator - The SSL Server is listening on port 9999
+2012-06-11 11:31:22,183 [Thread-4] DEBUG Comunicator - Waiting for client connection.
+2012-06-11 11:31:27,267 [Thread-4] DEBUG Comunicator - Client with IP 194.249.231.117 successfully connected to the server.
+2012-06-11 11:33:07,292 [Thread-4] DEBUG Comunicator - The SSL Socket is now closed.
+2012-06-11 11:33:07,293 [Thread-4] DEBUG Comunicator - The SSL Server shutted down.
+2012-06-11 11:33:43,842 [Thread-4] DEBUG Comunicator - The SSL Server is listening on port 9999
+2012-06-11 11:33:43,842 [Thread-4] DEBUG Comunicator - Waiting for client connection.
+2012-06-11 11:33:52,375 [Thread-4] DEBUG Comunicator - Client with IP 194.249.231.117 successfully connected to the server.
+2012-06-11 11:34:35,358 [Thread-4] DEBUG Comunicator - The SSL Socket is now closed.
+2012-06-11 11:34:35,359 [Thread-4] DEBUG Comunicator - The SSL Server shutted down.
+2012-06-11 17:28:11,712 [Thread-4] DEBUG Comunicator - The SSL Server is listening on port 9999
+2012-06-11 17:28:11,713 [Thread-4] DEBUG Comunicator - Waiting for client connection.
+2012-06-11 17:29:00,686 [Thread-4] DEBUG Comunicator - Client with IP 169.254.185.163 successfully connected to the server.
+2012-06-11 17:29:04,447 [Thread-4] DEBUG Comunicator - The SSL Socket is now closed.
+2012-06-11 17:29:04,447 [Thread-4] DEBUG Comunicator - Waiting for client connection.
+2012-06-11 17:29:04,448 [Thread-4] DEBUG Comunicator - Client with IP 194.249.231.117 successfully connected to the server.
+2012-06-11 17:32:09,264 [Thread-4] ERROR Comunicator - java.net.SocketException: Connection reset
+2012-06-11 17:32:09,264 [Thread-4] DEBUG Comunicator - The SSL Socket is now closed.
+2012-06-11 17:32:09,264 [Thread-4] DEBUG Comunicator - Waiting for client connection.
+2012-06-11 17:32:09,265 [Thread-4] DEBUG Comunicator - Client with IP 169.254.185.163 successfully connected to the server.
+2012-06-11 17:32:09,265 [Thread-4] ERROR Comunicator - javax.net.ssl.SSLHandshakeException: Remote host closed connection during handshake
+2012-06-11 17:32:09,265 [Thread-4] DEBUG Comunicator - The SSL Socket is now closed.
+2012-06-11 17:32:09,268 [Thread-4] DEBUG Comunicator - Waiting for client connection.
+2012-06-11 17:32:09,268 [Thread-4] DEBUG Comunicator - Client with IP 194.249.231.117 successfully connected to the server.
+2012-06-11 17:34:13,258 [Thread-4] ERROR Comunicator - java.net.SocketTimeoutException: Read timed out
+2012-06-11 17:34:13,258 [Thread-4] DEBUG Comunicator - The SSL Socket is now closed.
+2012-06-11 17:34:13,259 [Thread-4] DEBUG Comunicator - Waiting for client connection.
+2012-06-11 17:34:13,259 [Thread-4] DEBUG Comunicator - Client with IP 169.254.185.163 successfully connected to the server.
+2012-06-11 17:34:13,260 [Thread-4] ERROR Comunicator - javax.net.ssl.SSLHandshakeException: Remote host closed connection during handshake
+2012-06-11 17:34:13,260 [Thread-4] DEBUG Comunicator - The SSL Socket is now closed.
+2012-06-11 17:34:13,265 [Thread-4] DEBUG Comunicator - Waiting for client connection.
+2012-06-11 17:34:13,265 [Thread-4] DEBUG Comunicator - Client with IP 194.249.231.117 successfully connected to the server.
