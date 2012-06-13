@@ -542,8 +542,7 @@ public class Comunicator {
                             logger.debug("The SSL socket was closed unexpectedly or was forced to close.");
                         } finally {
                             open = false;
-                            sslServerRunning = false;
-                            runServer = false;
+                            sslServerRunning = false;                            
                             if (inputStream != null) {
                                 inputStream.close();
                             }
