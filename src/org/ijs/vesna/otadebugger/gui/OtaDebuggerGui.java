@@ -202,6 +202,7 @@ public class OtaDebuggerGui extends javax.swing.JFrame {
         });
 
         sendPostButton.setText("POST");
+        sendPostButton.setPreferredSize(new java.awt.Dimension(110, 23));
         sendPostButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 sendPostButtonActionPerformed(evt);
@@ -290,11 +291,11 @@ public class OtaDebuggerGui extends javax.swing.JFrame {
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(postContentLabel)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(postContentTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 71, Short.MAX_VALUE)))
+                                .add(postContentTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 128, Short.MAX_VALUE)))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
                             .add(org.jdesktop.layout.GroupLayout.TRAILING, sendPostButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .add(org.jdesktop.layout.GroupLayout.TRAILING, sendGetButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)))
+                            .add(org.jdesktop.layout.GroupLayout.TRAILING, sendGetButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)))
                     .add(jSeparator3)
                     .add(layout.createSequentialGroup()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -322,7 +323,7 @@ public class OtaDebuggerGui extends javax.swing.JFrame {
 
         layout.linkSize(new java.awt.Component[] {baudTextField, sslPortTextField}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
 
-        layout.linkSize(new java.awt.Component[] {baudSetButton, browseButton, clearButton, portToggleButton, sendGetButton, sendPostButton, sslSetPortButton}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
+        layout.linkSize(new java.awt.Component[] {baudSetButton, browseButton, clearButton, portToggleButton, sendGetButton, sendPostButton, sslSetPortButton, uploadButton}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
 
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -335,7 +336,7 @@ public class OtaDebuggerGui extends javax.swing.JFrame {
                     .add(sendGetButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(sendPostButton)
+                    .add(sendPostButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(postContentTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(postResourceTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(postResourceLabel)
@@ -386,10 +387,10 @@ public class OtaDebuggerGui extends javax.swing.JFrame {
 
         layout.linkSize(new java.awt.Component[] {baudTextField, firmwareTextField, getTextbar, postContentTextField, postResourceTextField, sslPortTextField, uriTextField}, org.jdesktop.layout.GroupLayout.VERTICAL);
 
-        layout.linkSize(new java.awt.Component[] {baudSetButton, browseButton, clearButton, portToggleButton, sendGetButton, sendPostButton, sslSetPortButton}, org.jdesktop.layout.GroupLayout.VERTICAL);
+        layout.linkSize(new java.awt.Component[] {baudSetButton, browseButton, clearButton, portToggleButton, sendGetButton, sendPostButton, sslSetPortButton, uploadButton}, org.jdesktop.layout.GroupLayout.VERTICAL);
 
         java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-609)/2, (screenSize.height-637)/2, 609, 637);
+        setBounds((screenSize.width-716)/2, (screenSize.height-637)/2, 716, 637);
     }// </editor-fold>//GEN-END:initComponents
 
     private void sendGetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sendGetButtonActionPerformed
