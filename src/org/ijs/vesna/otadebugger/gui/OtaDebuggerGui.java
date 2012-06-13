@@ -566,16 +566,22 @@ public class OtaDebuggerGui extends javax.swing.JFrame {
 
     private void sslSetPortButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sslSetPortButtonActionPerformed
         String response = "";
-        if (comm.isOpen()) {
+        if (comm.isOpen() || comm.isSslServerRunning()) {
             response = comm.sslDisconnect();
-            sslSetPortButton.setText("Reset SSL Port");
+            sslSetPortButton.setText("Open SSL socket");
         } else {
             try {
-                sslSetPortButton.setText("Reset SSL Port");
-                response = comm.sslConnect(Integer.parseInt(sslPortTextField.getText()));                
-                sslPortTextField.selectAll();
+                int port = Integer.parseInt(sslPortTextField.getText());
+
+                if (port > 0 && port <= 65535) {
+                    sslSetPortButton.setText("Close SSL socket");
+                    response = comm.sslConnect(port);
+                    sslPortTextField.selectAll();
+                } else {
+                    outputText("\nPlease select proper SSL port (integer between 0 and 65535)\n");
+                }
             } catch (Exception ex) {
-                outputText("Please select proper SSL port\n");
+                outputText("\nPlease select proper SSL port (integer between 0 and 65535)\n");
             }
         }
         outputText(response);

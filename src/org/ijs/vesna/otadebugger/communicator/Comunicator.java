@@ -40,7 +40,6 @@ public class Comunicator {
     private static final int SEMAPHORE = 1;
     private static final int MAX_PORTS = 20;
     private static final int MAX_RETRANSMISSIONS = 1;
-    private static final String CLOSING_STRING = "closesslsocket\r\n";
     private static final int TIMEOUT = 10000; // transmission timeout in ms
     private static final int MASTER_TIMEOUT = 60000; // transmission timeout in ms
     private static final Logger logger = Logger.getLogger(Comunicator.class);
@@ -54,6 +53,11 @@ public class Comunicator {
     private String portName = "";
     private CommPortIdentifier portIdentifier = null;
     private boolean open = false;
+    private boolean sslServerRunning = false;
+
+    public boolean isSslServerRunning() {
+        return sslServerRunning;
+    }
 
     public String getPortName() {
         return portName;
@@ -232,29 +236,24 @@ public class Comunicator {
             logger.error(ex);
         }
     }
-
     private SslServer sslServer = null;
 
     public String sslConnect(int port) {
         try {
             sslServer = new SslServer(port);
             (new Thread(sslServer)).start();
-            // open = true;
-            return "SSL server listening on port " + port + nl;
+            return "\nSSL server listening on port " + port + nl;
         } catch (Exception ex) {
-            return "SSL server setup failed" + nl;
+            return "\nSSL server setup failed" + nl;
         }
     }
 
     public String sslDisconnect() {
-        String res = "";
         try {
-            //res = sendPost(CLOSING_STRING.getBytes(), CLOSING_STRING.getBytes());
-            // open = false;
             sslServer.forceClose();
-            return "\nSSL reseted" + nl;
+            return "\nSSL socket closed" + nl;
         } catch (Exception ex) {
-            return "Reseting SSL failed" + nl;
+            return "\nClosing SSL socket failed" + nl;
         }
     }
 
@@ -445,21 +444,21 @@ public class Comunicator {
             int len;
             int avail;
             try {
-                while (open){
+                while (open) {
                     /*
-                     * we do not want to block, in order to be able to
-                     * close the serial line
+                     * we do not want to block, in order to be able to close the
+                     * serial line
                      */
                     avail = this.in.available();
-                    if(avail > 0){
+                    if (avail > 0) {
                         len = this.in.read(buffer, 0, avail);
                         receivedBuffer += new String(buffer, 0, len);
                     }
                     // wait a little
-                    synchronized(lockInt){
+                    synchronized (lockInt) {
                         try {
                             lockInt.wait(10);
-                        } catch(InterruptedException e){
+                        } catch (InterruptedException e) {
                             // whatever...
                         }
                     }
@@ -475,20 +474,30 @@ public class Comunicator {
 
         private int port;
         private boolean runServer = true;
+        SSLServerSocketFactory ssf = null;
+        ServerSocket ss = null;
+        Socket s = null;
 
         public SslServer(int port) {
             this.port = port;
         }
 
-        private Socket s = null;
-
-        public void forceClose(){
-            if(s != null){
-                try {
-                    s.close();
-                } catch(IOException e){
-                    logger.error(e);
+        public void forceClose() {
+            try {
+                open = false;
+                sslServerRunning = false;
+                runServer = false;
+                if (inputStream != null) {
+                    inputStream.close();
                 }
+                if (s != null) {
+                    s.close();
+                }
+                if (ss != null) {
+                    ss.close();
+                }
+            } catch (IOException e) {
+                logger.error(e);
             }
         }
 
@@ -497,8 +506,7 @@ public class Comunicator {
             try {
                 System.setProperty("javax.net.ssl.keyStore", "mySrvKeystore");
                 System.setProperty("javax.net.ssl.keyStorePassword", "123456");
-                SSLServerSocketFactory ssf = null;
-                ServerSocket ss = null;
+
                 try {
                     ssf = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
                     ss = ssf.createServerSocket(port);
@@ -506,47 +514,42 @@ public class Comunicator {
 
                     while (runServer) {
                         try {
+                            sslServerRunning = true;
+                            logger.debug("Waiting for client connection.");
+                            s = ss.accept();
+                            logger.debug("Client with IP "
+                                    + s.getInetAddress().getHostAddress()
+                                    + " successfully connected to the server.");
 
+                            inputStream = s.getInputStream();
+
+                            outputStream = s.getOutputStream();
+
+                            open = true;
+
+                            byte[] buffer = new byte[1024];
+                            int len;
                             try {
-                                logger.debug("Waiting for client connection.");
-                                s = ss.accept();
-                                logger.debug("Client with IP "
-                                        + s.getInetAddress().getHostAddress()
-                                        + " successfully connected to the server.");
-
-                                inputStream = s.getInputStream();
-
-                                outputStream = s.getOutputStream();
-
-                                open = true;
-
-                                byte[] buffer = new byte[1024];
-                                int len;
-                                try {
-                                    while (open) {
-                                        len = inputStream.read(buffer);
-                                        String recBuff = new String(buffer, 0, len);
-                                        if (recBuff.contains(CLOSING_STRING)) {
-                                            runServer = false;
-                                            break;
-                                        }
-                                        receivedBuffer += new String(buffer, 0, len);
-                                    }
-                                } catch (IOException e) {
-                                    logger.error(e);
+                                while (runServer) {
+                                    len = inputStream.read(buffer);
+                                    receivedBuffer += new String(buffer, 0, len);
                                 }
-                                logger.debug("The SSL Socket is now closed.");
-                            } catch (Exception ex) {
-                                logger.error("The SSL Socket was closed unexpectedly.");
-                                logger.error(ex);
-                            } finally {
-                                open = false;
+                            } catch (IOException e) {
+                                logger.debug("The SSL connection interrupted.");
+                            }
+                            logger.debug("The SSL Socket is now closed.");
+                        } catch (Exception ex) {
+                            logger.debug("The SSL socket was closed unexpectedly or was forced to close.");
+                        } finally {
+                            open = false;
+                            sslServerRunning = false;
+                            runServer = false;
+                            if (inputStream != null) {
                                 inputStream.close();
-                                inputStream.close();
+                            }
+                            if (s != null) {
                                 s.close();
                             }
-                        } catch (Exception ex) {
-                            logger.error(ex);
                         }
                     }
                     logger.debug("The SSL Server shutted down.");

@@ -5692,3 +5692,256 @@
 2012-06-12 16:58:25,222 [Thread-6] ERROR Comunicator - java.lang.NullPointerException
 2012-06-12 16:58:26,051 [Thread-7] ERROR Comunicator - java.net.BindException: Address already in use: JVM_Bind
 2012-06-12 16:58:26,052 [Thread-7] ERROR Comunicator - java.lang.NullPointerException
+2012-06-13 09:58:28,201 [Thread-4] DEBUG Comunicator - The SSL Server is listening on port 9999
+2012-06-13 09:58:28,201 [Thread-4] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 09:58:29,862 [Thread-5] ERROR Comunicator - java.net.BindException: Address already in use: JVM_Bind
+2012-06-13 09:58:29,862 [Thread-5] ERROR Comunicator - java.lang.NullPointerException
+2012-06-13 10:07:17,462 [Thread-4] DEBUG Comunicator - The SSL Server is listening on port 9999
+2012-06-13 10:07:17,463 [Thread-4] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 10:11:17,896 [Thread-4] DEBUG Comunicator - The SSL Server is listening on port 9999
+2012-06-13 10:11:17,896 [Thread-4] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 10:12:28,166 [Thread-4] DEBUG Comunicator - The SSL Server is listening on port 9999
+2012-06-13 10:12:28,166 [Thread-4] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 10:13:53,276 [Thread-4] ERROR Comunicator - java.lang.IllegalArgumentException: Port value out of range: 88888
+2012-06-13 10:13:53,277 [Thread-4] ERROR Comunicator - java.lang.NullPointerException
+2012-06-13 10:13:54,131 [Thread-5] ERROR Comunicator - java.lang.IllegalArgumentException: Port value out of range: 88888
+2012-06-13 10:13:54,131 [Thread-5] ERROR Comunicator - java.lang.NullPointerException
+2012-06-13 10:13:58,012 [Thread-6] ERROR Comunicator - java.lang.IllegalArgumentException: Port value out of range: 88888
+2012-06-13 10:13:58,012 [Thread-6] ERROR Comunicator - java.lang.NullPointerException
+2012-06-13 10:14:25,161 [Thread-7] ERROR Comunicator - java.lang.IllegalArgumentException: Port value out of range: 88888
+2012-06-13 10:14:25,161 [Thread-7] ERROR Comunicator - java.lang.NullPointerException
+2012-06-13 10:14:25,693 [Thread-8] ERROR Comunicator - java.lang.IllegalArgumentException: Port value out of range: 88888
+2012-06-13 10:14:25,693 [Thread-8] ERROR Comunicator - java.lang.NullPointerException
+2012-06-13 10:14:26,286 [Thread-9] ERROR Comunicator - java.lang.IllegalArgumentException: Port value out of range: 88888
+2012-06-13 10:14:26,286 [Thread-9] ERROR Comunicator - java.lang.NullPointerException
+2012-06-13 10:14:26,882 [Thread-10] ERROR Comunicator - java.lang.IllegalArgumentException: Port value out of range: 88888
+2012-06-13 10:14:26,882 [Thread-10] ERROR Comunicator - java.lang.NullPointerException
+2012-06-13 10:14:27,618 [Thread-11] ERROR Comunicator - java.lang.IllegalArgumentException: Port value out of range: 88888
+2012-06-13 10:14:27,618 [Thread-11] ERROR Comunicator - java.lang.NullPointerException
+2012-06-13 10:14:28,471 [Thread-12] ERROR Comunicator - java.lang.IllegalArgumentException: Port value out of range: 88888
+2012-06-13 10:14:28,471 [Thread-12] ERROR Comunicator - java.lang.NullPointerException
+2012-06-13 10:14:39,418 [Thread-13] DEBUG Comunicator - The SSL Server is listening on port 8888
+2012-06-13 10:14:39,418 [Thread-13] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 10:16:58,248 [Thread-4] DEBUG Comunicator - The SSL Server is listening on port 999
+2012-06-13 10:16:58,248 [Thread-4] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 10:19:38,350 [Thread-4] DEBUG Comunicator - The SSL Server is listening on port 333
+2012-06-13 10:19:38,350 [Thread-4] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 10:20:25,492 [Thread-4] DEBUG Comunicator - The SSL Server is listening on port 999
+2012-06-13 10:20:25,492 [Thread-4] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 10:26:27,924 [Thread-4] DEBUG Comunicator - The SSL Server is listening on port 999
+2012-06-13 10:26:27,924 [Thread-4] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 10:26:31,604 [Thread-4] ERROR Comunicator - The SSL Socket was closed unexpectedly.
+2012-06-13 10:26:31,605 [Thread-4] ERROR Comunicator - java.net.SocketException: socket closed
+2012-06-13 10:26:31,605 [Thread-4] ERROR Comunicator - java.lang.NullPointerException
+2012-06-13 10:26:49,118 [Thread-5] DEBUG Comunicator - The SSL Server is listening on port 999
+2012-06-13 10:26:49,118 [Thread-5] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 10:26:53,844 [Thread-5] ERROR Comunicator - The SSL Socket was closed unexpectedly.
+2012-06-13 10:26:53,844 [Thread-5] ERROR Comunicator - java.net.SocketException: socket closed
+2012-06-13 10:26:53,844 [Thread-5] ERROR Comunicator - java.lang.NullPointerException
+2012-06-13 10:26:57,223 [Thread-6] DEBUG Comunicator - The SSL Server is listening on port 999
+2012-06-13 10:26:57,223 [Thread-6] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 10:27:06,086 [Thread-6] ERROR Comunicator - The SSL Socket was closed unexpectedly.
+2012-06-13 10:27:06,087 [Thread-6] ERROR Comunicator - java.net.SocketException: socket closed
+2012-06-13 10:27:06,087 [Thread-6] ERROR Comunicator - java.lang.NullPointerException
+2012-06-13 10:27:07,869 [Thread-7] DEBUG Comunicator - The SSL Server is listening on port 999
+2012-06-13 10:27:07,869 [Thread-7] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 10:27:09,522 [Thread-7] ERROR Comunicator - The SSL Socket was closed unexpectedly.
+2012-06-13 10:27:09,522 [Thread-7] ERROR Comunicator - java.net.SocketException: socket closed
+2012-06-13 10:27:09,522 [Thread-7] ERROR Comunicator - java.lang.NullPointerException
+2012-06-13 10:27:11,569 [Thread-8] DEBUG Comunicator - The SSL Server is listening on port 999
+2012-06-13 10:27:11,573 [Thread-8] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 10:27:12,694 [Thread-8] ERROR Comunicator - The SSL Socket was closed unexpectedly.
+2012-06-13 10:27:12,694 [Thread-8] ERROR Comunicator - java.net.SocketException: socket closed
+2012-06-13 10:27:12,694 [Thread-8] ERROR Comunicator - java.lang.NullPointerException
+2012-06-13 10:27:14,204 [Thread-9] DEBUG Comunicator - The SSL Server is listening on port 999
+2012-06-13 10:27:14,204 [Thread-9] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 10:27:15,316 [Thread-9] ERROR Comunicator - The SSL Socket was closed unexpectedly.
+2012-06-13 10:27:15,316 [Thread-9] ERROR Comunicator - java.net.SocketException: socket closed
+2012-06-13 10:27:15,316 [Thread-9] ERROR Comunicator - java.lang.NullPointerException
+2012-06-13 10:28:27,302 [Thread-4] DEBUG Comunicator - The SSL Server is listening on port 9999
+2012-06-13 10:28:27,302 [Thread-4] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 10:28:28,671 [Thread-4] ERROR Comunicator - The SSL Socket was closed unexpectedly or was forced to close.
+2012-06-13 10:28:28,671 [Thread-4] ERROR Comunicator - java.lang.NullPointerException
+2012-06-13 10:29:15,394 [Thread-4] DEBUG Comunicator - The SSL Server is listening on port 999
+2012-06-13 10:29:15,395 [Thread-4] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 10:29:37,850 [Thread-4] ERROR Comunicator - The SSL Socket was closed unexpectedly or was forced to close.
+2012-06-13 10:29:51,680 [Thread-4] ERROR Comunicator - java.lang.NullPointerException
+2012-06-13 10:30:21,455 [Thread-4] DEBUG Comunicator - The SSL Server is listening on port 999
+2012-06-13 10:30:21,455 [Thread-4] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 10:30:24,841 [Thread-4] ERROR Comunicator - The SSL Socket was closed unexpectedly or was forced to close.
+2012-06-13 10:31:39,757 [Thread-4] ERROR Comunicator - java.lang.NullPointerException
+2012-06-13 10:31:48,597 [Thread-4] DEBUG Comunicator - The SSL Server is listening on port 9999
+2012-06-13 10:31:48,597 [Thread-4] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 10:31:50,184 [Thread-4] ERROR Comunicator - The SSL Socket was closed unexpectedly or was forced to close.
+2012-06-13 10:31:50,185 [Thread-4] ERROR Comunicator - java.lang.NullPointerException
+2012-06-13 10:32:06,863 [Thread-5] DEBUG Comunicator - The SSL Server is listening on port 9999
+2012-06-13 10:32:06,863 [Thread-5] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 10:32:11,868 [Thread-5] ERROR Comunicator - The SSL Socket was closed unexpectedly or was forced to close.
+2012-06-13 10:32:25,485 [Thread-5] ERROR Comunicator - java.lang.NullPointerException
+2012-06-13 10:33:11,415 [Thread-4] DEBUG Comunicator - The SSL Server is listening on port 999
+2012-06-13 10:33:11,415 [Thread-4] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 10:33:12,271 [Thread-4] ERROR Comunicator - The SSL Socket was closed unexpectedly or was forced to close.
+2012-06-13 10:33:12,271 [Thread-4] DEBUG Comunicator - The SSL Server shutted down.
+2012-06-13 10:33:19,682 [Thread-5] DEBUG Comunicator - The SSL Server is listening on port 999
+2012-06-13 10:33:19,687 [Thread-5] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 10:33:21,726 [Thread-5] ERROR Comunicator - The SSL Socket was closed unexpectedly or was forced to close.
+2012-06-13 10:33:21,726 [Thread-5] DEBUG Comunicator - The SSL Server shutted down.
+2012-06-13 10:36:39,601 [Thread-6] ERROR Comunicator - java.lang.IllegalArgumentException: Port value out of range: 999677554
+2012-06-13 10:36:39,601 [Thread-6] ERROR Comunicator - java.lang.NullPointerException
+2012-06-13 10:37:34,813 [Thread-7] DEBUG Comunicator - The SSL Server is listening on port 5675
+2012-06-13 10:37:34,813 [Thread-7] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 10:37:39,094 [Thread-7] ERROR Comunicator - The SSL Socket was closed unexpectedly or was forced to close.
+2012-06-13 10:37:39,094 [Thread-7] DEBUG Comunicator - The SSL Server shutted down.
+2012-06-13 10:38:56,957 [Thread-8] ERROR Comunicator - java.lang.IllegalArgumentException: Port value out of range: 56754646
+2012-06-13 10:38:56,957 [Thread-8] ERROR Comunicator - java.lang.NullPointerException
+2012-06-13 10:41:10,273 [Thread-4] DEBUG Comunicator - The SSL Server is listening on port 9999
+2012-06-13 10:41:10,273 [Thread-4] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 10:41:13,190 [Thread-4] ERROR Comunicator - The SSL Socket was closed unexpectedly or was forced to close.
+2012-06-13 10:41:13,190 [Thread-4] DEBUG Comunicator - The SSL Server shutted down.
+2012-06-13 10:41:20,183 [Thread-5] ERROR Comunicator - java.lang.IllegalArgumentException: Port value out of range: 99999
+2012-06-13 10:41:20,183 [Thread-5] ERROR Comunicator - java.lang.NullPointerException
+2012-06-13 10:41:33,950 [Thread-6] ERROR Comunicator - java.lang.IllegalArgumentException: Port value out of range: 999999999
+2012-06-13 10:41:33,950 [Thread-6] ERROR Comunicator - java.lang.NullPointerException
+2012-06-13 10:44:01,794 [Thread-4] ERROR Comunicator - java.lang.IllegalArgumentException: Port value out of range: 99999
+2012-06-13 10:44:01,794 [Thread-4] ERROR Comunicator - java.lang.NullPointerException
+2012-06-13 10:45:04,567 [Thread-4] ERROR Comunicator - java.lang.IllegalArgumentException: Port value out of range: 9999999
+2012-06-13 10:45:04,567 [Thread-4] ERROR Comunicator - java.lang.NullPointerException
+2012-06-13 10:47:21,767 [Thread-5] ERROR Comunicator - java.lang.IllegalArgumentException: Port value out of range: 9999999
+2012-06-13 10:47:21,767 [Thread-5] ERROR Comunicator - java.lang.NullPointerException
+2012-06-13 10:50:46,172 [Thread-6] ERROR Comunicator - java.lang.IllegalArgumentException: Port value out of range: 9999999
+2012-06-13 10:50:46,173 [Thread-6] ERROR Comunicator - java.lang.NullPointerException
+2012-06-13 10:50:54,648 [Thread-7] DEBUG Comunicator - The SSL Server is listening on port 65535
+2012-06-13 10:50:54,648 [Thread-7] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 10:51:39,773 [Thread-7] ERROR Comunicator - The SSL Socket was closed unexpectedly or was forced to close.
+2012-06-13 10:51:39,773 [Thread-7] DEBUG Comunicator - The SSL Server shutted down.
+2012-06-13 10:51:46,929 [Thread-4] ERROR Comunicator - java.lang.IllegalArgumentException: Port value out of range: 65536
+2012-06-13 10:51:46,929 [Thread-4] ERROR Comunicator - java.lang.NullPointerException
+2012-06-13 10:51:50,293 [Thread-5] ERROR Comunicator - java.lang.IllegalArgumentException: Port value out of range: 65536
+2012-06-13 10:51:50,293 [Thread-5] ERROR Comunicator - java.lang.NullPointerException
+2012-06-13 10:51:53,963 [Thread-6] DEBUG Comunicator - The SSL Server is listening on port 65535
+2012-06-13 10:51:53,963 [Thread-6] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 10:52:09,644 [Thread-6] ERROR Comunicator - The SSL Socket was closed unexpectedly or was forced to close.
+2012-06-13 10:52:09,645 [Thread-6] DEBUG Comunicator - The SSL Server shutted down.
+2012-06-13 10:52:18,605 [Thread-7] DEBUG Comunicator - The SSL Server is listening on port 55518
+2012-06-13 10:52:18,605 [Thread-7] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 10:52:29,494 [Thread-7] ERROR Comunicator - The SSL Socket was closed unexpectedly or was forced to close.
+2012-06-13 10:52:29,494 [Thread-7] DEBUG Comunicator - The SSL Server shutted down.
+2012-06-13 10:52:32,869 [Thread-8] DEBUG Comunicator - The SSL Server is listening on port 55528
+2012-06-13 10:52:32,869 [Thread-8] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 10:52:43,342 [Thread-8] ERROR Comunicator - The SSL Socket was closed unexpectedly or was forced to close.
+2012-06-13 10:52:43,342 [Thread-8] DEBUG Comunicator - The SSL Server shutted down.
+2012-06-13 10:52:45,669 [Thread-9] DEBUG Comunicator - The SSL Server is listening on port 1
+2012-06-13 10:52:45,669 [Thread-9] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 10:52:52,620 [Thread-9] ERROR Comunicator - The SSL Socket was closed unexpectedly or was forced to close.
+2012-06-13 10:52:52,620 [Thread-9] DEBUG Comunicator - The SSL Server shutted down.
+2012-06-13 10:52:54,852 [Thread-10] DEBUG Comunicator - The SSL Server is listening on port 2
+2012-06-13 10:52:54,852 [Thread-10] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 10:53:04,160 [Thread-10] ERROR Comunicator - The SSL Socket was closed unexpectedly or was forced to close.
+2012-06-13 10:53:04,160 [Thread-10] DEBUG Comunicator - The SSL Server shutted down.
+2012-06-13 10:53:09,219 [Thread-11] DEBUG Comunicator - The SSL Server is listening on port 55571
+2012-06-13 10:53:09,219 [Thread-11] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 10:58:51,987 [Thread-4] DEBUG Comunicator - The SSL Server is listening on port 3425
+2012-06-13 10:58:51,988 [Thread-4] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 10:58:56,016 [Thread-4] ERROR Comunicator - The SSL Socket was closed unexpectedly or was forced to close.
+2012-06-13 10:58:56,016 [Thread-4] DEBUG Comunicator - The SSL Server shutted down.
+2012-06-13 10:58:59,306 [Thread-5] DEBUG Comunicator - The SSL Server is listening on port 3425
+2012-06-13 10:58:59,306 [Thread-5] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 10:58:59,994 [Thread-5] ERROR Comunicator - The SSL Socket was closed unexpectedly or was forced to close.
+2012-06-13 10:58:59,994 [Thread-5] DEBUG Comunicator - The SSL Server shutted down.
+2012-06-13 10:59:00,523 [Thread-6] DEBUG Comunicator - The SSL Server is listening on port 3425
+2012-06-13 10:59:00,523 [Thread-6] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 10:59:00,970 [Thread-6] ERROR Comunicator - The SSL Socket was closed unexpectedly or was forced to close.
+2012-06-13 10:59:00,970 [Thread-6] DEBUG Comunicator - The SSL Server shutted down.
+2012-06-13 10:59:01,940 [Thread-7] DEBUG Comunicator - The SSL Server is listening on port 3425
+2012-06-13 10:59:01,940 [Thread-7] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 10:59:02,438 [Thread-7] ERROR Comunicator - The SSL Socket was closed unexpectedly or was forced to close.
+2012-06-13 10:59:02,439 [Thread-7] DEBUG Comunicator - The SSL Server shutted down.
+2012-06-13 10:59:03,705 [Thread-8] DEBUG Comunicator - The SSL Server is listening on port 3425
+2012-06-13 10:59:03,706 [Thread-8] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 10:59:04,268 [Thread-8] ERROR Comunicator - The SSL Socket was closed unexpectedly or was forced to close.
+2012-06-13 10:59:04,269 [Thread-8] DEBUG Comunicator - The SSL Server shutted down.
+2012-06-13 10:59:08,103 [Thread-9] DEBUG Comunicator - The SSL Server is listening on port 3425
+2012-06-13 10:59:08,103 [Thread-9] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 10:59:08,638 [Thread-9] ERROR Comunicator - The SSL Socket was closed unexpectedly or was forced to close.
+2012-06-13 10:59:08,638 [Thread-9] DEBUG Comunicator - The SSL Server shutted down.
+2012-06-13 10:59:09,582 [Thread-10] DEBUG Comunicator - The SSL Server is listening on port 3425
+2012-06-13 10:59:09,582 [Thread-10] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 10:59:09,813 [Thread-10] ERROR Comunicator - The SSL Socket was closed unexpectedly or was forced to close.
+2012-06-13 10:59:09,813 [Thread-10] DEBUG Comunicator - The SSL Server shutted down.
+2012-06-13 10:59:52,333 [Thread-11] DEBUG Comunicator - The SSL Server is listening on port 342
+2012-06-13 10:59:52,334 [Thread-11] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 10:59:55,315 [Thread-11] ERROR Comunicator - The SSL Socket was closed unexpectedly or was forced to close.
+2012-06-13 10:59:55,315 [Thread-11] DEBUG Comunicator - The SSL Server shutted down.
+2012-06-13 10:59:58,490 [Thread-12] DEBUG Comunicator - The SSL Server is listening on port 342
+2012-06-13 10:59:58,490 [Thread-12] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 11:11:47,037 [Thread-4] DEBUG Comunicator - The SSL Server is listening on port 999
+2012-06-13 11:11:47,037 [Thread-4] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 11:11:52,269 [Thread-4] ERROR Comunicator - The SSL Socket was closed unexpectedly or was forced to close.
+2012-06-13 11:11:52,269 [Thread-4] DEBUG Comunicator - The SSL Server shutted down.
+2012-06-13 11:11:55,643 [Thread-5] DEBUG Comunicator - The SSL Server is listening on port 9999
+2012-06-13 11:11:55,644 [Thread-5] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 11:12:00,518 [Thread-5] ERROR Comunicator - The SSL Socket was closed unexpectedly or was forced to close.
+2012-06-13 11:12:00,518 [Thread-5] DEBUG Comunicator - The SSL Server shutted down.
+2012-06-13 11:12:17,906 [Thread-6] DEBUG Comunicator - The SSL Server is listening on port 1
+2012-06-13 11:12:17,906 [Thread-6] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 11:12:34,228 [Thread-6] ERROR Comunicator - The SSL Socket was closed unexpectedly or was forced to close.
+2012-06-13 11:12:34,228 [Thread-6] DEBUG Comunicator - The SSL Server shutted down.
+2012-06-13 11:12:34,813 [Thread-7] DEBUG Comunicator - The SSL Server is listening on port 65535
+2012-06-13 11:12:34,813 [Thread-7] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 11:12:42,460 [Thread-7] ERROR Comunicator - The SSL Socket was closed unexpectedly or was forced to close.
+2012-06-13 11:12:42,460 [Thread-7] DEBUG Comunicator - The SSL Server shutted down.
+2012-06-13 11:13:07,733 [Thread-8] DEBUG Comunicator - The SSL Server is listening on port 6553
+2012-06-13 11:13:07,733 [Thread-8] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 11:13:14,396 [Thread-8] ERROR Comunicator - The SSL Socket was closed unexpectedly or was forced to close.
+2012-06-13 11:13:14,396 [Thread-8] DEBUG Comunicator - The SSL Server shutted down.
+2012-06-13 11:13:16,156 [Thread-9] DEBUG Comunicator - The SSL Server is listening on port 6553
+2012-06-13 11:13:16,157 [Thread-9] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 11:13:37,748 [Thread-9] ERROR Comunicator - The SSL Socket was closed unexpectedly or was forced to close.
+2012-06-13 11:13:37,748 [Thread-9] DEBUG Comunicator - The SSL Server shutted down.
+2012-06-13 11:13:42,011 [Thread-10] DEBUG Comunicator - The SSL Server is listening on port 9999
+2012-06-13 11:13:42,012 [Thread-10] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 11:14:30,033 [Thread-10] DEBUG Comunicator - Client with IP 194.249.231.113 successfully connected to the server.
+2012-06-13 11:16:22,128 [Thread-4] DEBUG Comunicator - The SSL Server is listening on port 9999
+2012-06-13 11:16:22,129 [Thread-4] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 11:16:27,726 [Thread-4] DEBUG Comunicator - Client with IP 194.249.231.113 successfully connected to the server.
+2012-06-13 11:18:19,486 [Thread-4] ERROR Comunicator - java.net.SocketException: Connection reset
+2012-06-13 11:18:29,764 [Thread-4] DEBUG Comunicator - The SSL Socket is now closed.
+2012-06-13 11:18:45,197 [Thread-4] DEBUG Comunicator - The SSL Server shutted down.
+2012-06-13 11:22:19,507 [Thread-4] DEBUG Comunicator - The SSL Server is listening on port 9999
+2012-06-13 11:22:19,507 [Thread-4] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 11:22:24,132 [Thread-4] DEBUG Comunicator - Client with IP 194.249.231.113 successfully connected to the server.
+2012-06-13 11:22:27,543 [Thread-4] ERROR Comunicator - java.net.SocketException: socket closed
+2012-06-13 11:22:27,543 [Thread-4] DEBUG Comunicator - The SSL Socket is now closed.
+2012-06-13 11:22:27,544 [Thread-4] DEBUG Comunicator - The SSL Server shutted down.
+2012-06-13 11:23:05,119 [Thread-5] DEBUG Comunicator - The SSL Server is listening on port 9999
+2012-06-13 11:23:05,120 [Thread-5] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 11:23:08,710 [Thread-5] DEBUG Comunicator - Client with IP 194.249.231.113 successfully connected to the server.
+2012-06-13 11:23:13,823 [Thread-5] ERROR Comunicator - java.net.SocketException: socket closed
+2012-06-13 11:23:13,824 [Thread-5] DEBUG Comunicator - The SSL Socket is now closed.
+2012-06-13 11:23:13,824 [Thread-5] DEBUG Comunicator - The SSL Server shutted down.
+2012-06-13 11:24:25,177 [Thread-4] DEBUG Comunicator - The SSL Server is listening on port 9999
+2012-06-13 11:24:25,177 [Thread-4] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 11:24:28,525 [Thread-4] DEBUG Comunicator - Client with IP 194.249.231.113 successfully connected to the server.
+2012-06-13 11:24:44,547 [Thread-4] ERROR Comunicator - java.net.SocketException: socket closed
+2012-06-13 11:25:06,540 [Thread-4] ERROR Comunicator - The SSL Socket was closed unexpectedly or was forced to close.
+2012-06-13 11:25:07,376 [Thread-4] ERROR Comunicator - The SSL Socket was closed unexpectedly or was forced to close.
+2012-06-13 11:27:21,467 [Thread-4] DEBUG Comunicator - The SSL Server is listening on port 9999
+2012-06-13 11:27:21,467 [Thread-4] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 11:27:22,460 [Thread-4] DEBUG Comunicator - The SSL socket was closed unexpectedly or was forced to close.
+2012-06-13 11:27:22,460 [Thread-4] DEBUG Comunicator - The SSL Server shutted down.
+2012-06-13 11:27:26,599 [Thread-5] DEBUG Comunicator - The SSL Server is listening on port 9999
+2012-06-13 11:27:26,599 [Thread-5] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 11:27:31,021 [Thread-5] DEBUG Comunicator - Client with IP 194.249.231.113 successfully connected to the server.
+2012-06-13 11:27:39,576 [Thread-5] DEBUG Comunicator - The SSL connection interrupted.
+2012-06-13 11:27:39,577 [Thread-5] DEBUG Comunicator - The SSL Socket is now closed.
+2012-06-13 11:27:39,577 [Thread-5] DEBUG Comunicator - The SSL Server shutted down.
+2012-06-13 11:27:45,899 [Thread-6] DEBUG Comunicator - The SSL Server is listening on port 9999
+2012-06-13 11:27:45,900 [Thread-6] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 11:27:48,132 [Thread-6] DEBUG Comunicator - The SSL socket was closed unexpectedly or was forced to close.
+2012-06-13 11:27:48,132 [Thread-6] DEBUG Comunicator - The SSL Server shutted down.
+2012-06-13 11:27:50,336 [Thread-7] DEBUG Comunicator - The SSL Server is listening on port 9999
+2012-06-13 11:27:50,337 [Thread-7] DEBUG Comunicator - Waiting for client connection.
+2012-06-13 11:27:55,784 [Thread-7] DEBUG Comunicator - Client with IP 194.249.231.113 successfully connected to the server.
+2012-06-13 11:28:02,090 [Thread-7] DEBUG Comunicator - The SSL connection interrupted.
+2012-06-13 11:28:02,091 [Thread-7] DEBUG Comunicator - The SSL Socket is now closed.
+2012-06-13 11:28:02,091 [Thread-7] DEBUG Comunicator - The SSL Server shutted down.
