@@ -1,0 +1,16 @@
+2012-06-29 10:46:17,933 [Thread-4] DEBUG Comunicator - The SSL Server is listening on port 9999
+2012-06-29 10:46:17,934 [Thread-4] DEBUG Comunicator - Waiting for client connection.
+2012-06-29 10:46:18,431 [Thread-4] DEBUG Comunicator - The SSL socket was closed unexpectedly or was forced to close.
+2012-06-29 10:46:18,431 [Thread-4] DEBUG Comunicator - The SSL Server shutted down.
+2012-06-29 10:46:30,902 [Thread-5] DEBUG Comunicator - The SSL Server is listening on port 9999
+2012-06-29 10:46:30,902 [Thread-5] DEBUG Comunicator - Waiting for client connection.
+2012-06-29 10:46:56,455 [Thread-5] DEBUG Comunicator - Client with IP 127.0.0.1 successfully connected to the server.
+2012-06-29 10:47:19,404 [Thread-5] DEBUG Comunicator - The SSL connection interrupted.
+2012-06-29 10:47:19,405 [Thread-5] DEBUG Comunicator - The SSL Socket is now closed.
+2012-06-29 10:47:19,405 [Thread-5] DEBUG Comunicator - The SSL Server shutted down.
+2012-06-29 10:47:24,911 [Thread-6] DEBUG Comunicator - The SSL Server is listening on port 9999
+2012-06-29 10:47:24,911 [Thread-6] DEBUG Comunicator - Waiting for client connection.
+2012-06-29 10:47:31,704 [Thread-6] DEBUG Comunicator - Client with IP 127.0.0.1 successfully connected to the server.
+2012-06-29 10:48:12,098 [Thread-6] DEBUG Comunicator - The SSL connection interrupted.
+2012-06-29 10:48:12,098 [Thread-6] DEBUG Comunicator - The SSL Socket is now closed.
+2012-06-29 10:48:12,098 [Thread-6] DEBUG Comunicator - The SSL Server shutted down.

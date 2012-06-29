@@ -1,0 +1,18 @@
+2012-06-29T10:47:09.274+0200: Request:
+GET hello
+
+2012-06-29T10:47:09.297+0200: Response:
+GET hello
+
+OK
+
+
+2012-06-29T10:47:39.715+0200: Request:
+GET hello
+
+2012-06-29T10:47:39.726+0200: Response:
+GET hello
+
+OK
+
+

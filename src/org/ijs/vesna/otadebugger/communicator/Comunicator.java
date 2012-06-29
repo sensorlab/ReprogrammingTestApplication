@@ -7,11 +7,13 @@ package org.ijs.vesna.otadebugger.communicator;
 import gnu.io.CommPort;
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.ByteBuffer;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.concurrent.Semaphore;
 import java.util.zip.CRC32;
@@ -36,16 +38,19 @@ public class Comunicator {
     private static final String JUNK_INPUT = "\r\nJUNK-INPUT\r\n";
     private static final String CORRUPTED_DATA = "\r\nCORRUPTED-DATA\r\n";
     private static final String ERROR = "\r\nERROR\r\n";
-    private static final String REBOOT_RESOURCE = "prog/doRestart";
+    private static final String NODES = "NODES";
+    private static final String NODES_JUNK = "junk";
     private static final int SEMAPHORE = 1;
     private static final int MAX_PORTS = 20;
     private static final int MAX_RETRANSMISSIONS = 1;
-    private static final int TIMEOUT = 10000; // transmission timeout in ms
-    private static final int MASTER_TIMEOUT = 60000; // transmission timeout in ms
+    private static final int TIMEOUT = 60000; // transmission timeout in ms
+    private static final int MASTER_TIMEOUT = 120000; // transmission timeout in ms
     private static final Logger logger = Logger.getLogger(Comunicator.class);
+    private static final int MEGABYTE = 1024 * 1024;
     private InputStream inputStream;
     private OutputStream outputStream;
-    private String receivedBuffer = "";
+    private String receivedBufferStr = "";
+    private ByteBuffer receivedBuffer = ByteBuffer.allocate(MEGABYTE);
     private final Semaphore semaphore = new Semaphore(SEMAPHORE, true);
     private String[] tempPortList, portList; //list of ports for combobox dropdown
     private CommPort commPort;
@@ -54,6 +59,96 @@ public class Comunicator {
     private CommPortIdentifier portIdentifier = null;
     private boolean open = false;
     private boolean sslServerRunning = false;
+    private SslServer sslServer = null;
+
+    public Comunicator() {
+        try {
+            byte[] bytes = new byte[MEGABYTE];
+            receivedBuffer = ByteBuffer.allocate(MEGABYTE);
+        } catch (Exception ex) {
+            logger.error(ex);
+        }
+    }
+
+    public void appendToTxtLog(String text) {
+
+        String fileName = System.getProperty("user.dir") + System.getProperty("file.separator")
+                + "logs" + System.getProperty("file.separator") + "request-response-txt.log";
+
+        File file = new File(fileName);
+
+        // Does the file already exist
+        if (!file.exists()) {
+            try {
+                // Try creating the file
+                file.createNewFile();
+            } catch (IOException ioe) {
+                // ignore
+            }
+        }
+
+        BufferedWriter bw = null;
+
+        try {
+            bw = new BufferedWriter(new FileWriter(fileName, true));
+            bw.write(text);
+            bw.newLine();
+            bw.flush();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        } finally {
+            if (bw != null) {
+                try {
+                    bw.close();
+                } catch (IOException ioe2) {
+                    // just ignore it
+                }
+            }
+        }
+    }
+
+    public void appendToHexLog(String text) {
+
+        String fileName = System.getProperty("user.dir") + System.getProperty("file.separator")
+                + "logs" + System.getProperty("file.separator") + "request-response-hex.log";
+
+        File file = new File(fileName);
+
+        // Does the file already exist
+        if (!file.exists()) {
+            try {
+                // Try creating the file
+                file.createNewFile();
+            } catch (IOException ioe) {
+                // ignore
+            }
+        }
+
+        BufferedWriter bw = null;
+
+        try {
+            bw = new BufferedWriter(new FileWriter(fileName, true));
+            bw.write(text);
+            bw.newLine();
+            bw.flush();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        } finally {
+            if (bw != null) {
+                try {
+                    bw.close();
+                } catch (IOException ioe2) {
+                    // just ignore it
+                }
+            }
+        }
+    }
+
+    private String getCurrentTime() {
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        String timeString = df.format(new Date());
+        return timeString + ": ";
+    }
 
     public boolean isSslServerRunning() {
         return sslServerRunning;
@@ -73,53 +168,77 @@ public class Comunicator {
     }
 
     public String sendGet(byte[] params) {
-        //TODO implement timeout
         String errorReport = "";
         if (semaphore.tryAcquire()) {
             try {
                 for (int i = 0; i < MAX_RETRANSMISSIONS; i++) {
+                    appendToTxtLog(getCurrentTime() + "Request:\n" + GET + new String(params) + CR_LF);
+                    appendToHexLog(getCurrentTime() + "Request:\n" + GET + new String(params) + CR_LF);
+
+                    String tmpBuff = "tmp";
+                    receivedBuffer.clear();
+                    receivedBufferStr = ""; //TODO make it local
+
                     outputStream.write(GET.getBytes());
                     outputStream.write(params);
                     outputStream.write(CR_LF.getBytes());
 
                     long startMaster = System.currentTimeMillis();
                     long start = System.currentTimeMillis();
-                    String tmpBuff = "tmp";
-                    receivedBuffer = "";
-                    while (!receivedBuffer.contains(RESPONSE_END) && open) {
-                        if (!receivedBuffer.equals(tmpBuff)) {
+                    while (!receivedBufferStr.contains(RESPONSE_END) && open) {
+                        if (!receivedBufferStr.equals(tmpBuff)) {
                             start = System.currentTimeMillis();
                         }
                         long stop = System.currentTimeMillis();
                         if ((stop - start) > TIMEOUT || (stop - startMaster) > MASTER_TIMEOUT) {
-                            return receivedBuffer + nl + "Fatal Error: Response Timeout" + nl + nl;
+                            appendToTxtLog(getCurrentTime() + "Response:\n" + receivedBufferStr + nl + "Fatal Error: Response Timeout" + nl);
+                            receivedBuffer.flip();
+                            String hexStr = "";
+                            for (int j = 0; j < receivedBuffer.limit(); j++) {
+                                hexStr += Integer.toHexString(receivedBuffer.get(j)) + " ";
+                            }
+                            appendToHexLog(getCurrentTime() + "Response:\n" + hexStr + nl + "Fatal Error: Response Timeout" + nl);
+                            return receivedBufferStr + nl + "Fatal Error: Response Timeout" + nl;
                         }
-                        tmpBuff = receivedBuffer;
+                        tmpBuff = receivedBufferStr;
                         try {
                             Thread.sleep(1);
                         } catch (InterruptedException ignore) {
                         }
                     }
-                    receivedBuffer = receivedBuffer.replace(RESPONSE_END, "");
-                    if (receivedBuffer.contains(JUNK_INPUT)
-                            || receivedBuffer.contains(CORRUPTED_DATA)) {
-                        receivedBuffer = receivedBuffer.replace(JUNK_INPUT, "");
-                        receivedBuffer = receivedBuffer.replace(CORRUPTED_DATA, "");
-                        String junkReport = receivedBuffer;
+                    if (receivedBufferStr.contains(JUNK_INPUT)
+                            || receivedBufferStr.contains(CORRUPTED_DATA)) {
+                        receivedBufferStr = receivedBufferStr.replace(JUNK_INPUT, "");
+                        receivedBufferStr = receivedBufferStr.replace(CORRUPTED_DATA, "");
+                        String junkReport = receivedBufferStr;
                         sendRecoveryRequest();
                         if (i == MAX_RETRANSMISSIONS - 1) {
-                            receivedBuffer = junkReport
+                            receivedBufferStr = junkReport
                                     + nl + "fatal error request did not go through, retransmissions: " + (i + 1) + nl;
                         } else {
-                            receivedBuffer = junkReport
+                            receivedBufferStr = junkReport
                                     + nl + "send with retransmissions: " + (i + 1) + nl;
                         }
-                    } else if (receivedBuffer.contains(ERROR)) {
-                        receivedBuffer = receivedBuffer.replace(ERROR, "");
-                        errorReport = receivedBuffer
+                    } else if (receivedBufferStr.contains(ERROR)) {
+                        if (receivedBufferStr.contains(NODES) && receivedBufferStr.contains(NODES_JUNK)) {
+                            //TODO send parser recoveri to the node
+                            String nodeRequest = new String(params);
+                            String xbitAddr = nodeRequest.substring(nodeRequest.indexOf('?') + 1, nodeRequest.indexOf('/'));
+                            sendNodeRecoveryRequest(xbitAddr);
+                        }
+                        receivedBufferStr = receivedBufferStr.replace(ERROR, "");
+                        errorReport = receivedBufferStr
                                 + nl + "send with retransmissions: " + (i + 1) + nl;
                     } else {
-                        return receivedBuffer + nl;
+                        appendToTxtLog(getCurrentTime() + "Response:\n" + receivedBufferStr + nl);
+                        receivedBuffer.flip();
+                        String hexStr = "";
+                        for (int j = 0; j < receivedBuffer.limit(); j++) {
+                            hexStr += Integer.toHexString(receivedBuffer.get(j)) + " ";
+                        }
+                        appendToHexLog(getCurrentTime() + "Response:\n" + hexStr + nl);
+                        receivedBufferStr = receivedBufferStr.replace(RESPONSE_END, "");
+                        return receivedBufferStr + nl;
                     }
                 }
             } catch (Exception ex) {
@@ -128,19 +247,24 @@ public class Comunicator {
                 semaphore.release();
             }
         } else {
-            receivedBuffer = "ERROR: Communication in progress\n";
+            receivedBufferStr = "ERROR: Communication in progress\n";
         }
-        return receivedBuffer + nl + errorReport + nl;
+        appendToTxtLog(getCurrentTime() + "Response:\n" + receivedBufferStr + nl + errorReport + nl);
+        receivedBuffer.flip();
+        String hexStr = "";
+        for (int j = 0; j < receivedBuffer.limit(); j++) {
+            hexStr += Integer.toHexString(receivedBuffer.get(j)) + " ";
+        }
+        appendToHexLog(getCurrentTime() + "Response:\n" + hexStr + nl + errorReport + nl);
+        receivedBufferStr = receivedBufferStr.replace(RESPONSE_END, "");
+        return receivedBufferStr + nl + errorReport + nl;
     }
 
     public String sendPost(byte[] params, byte[] content) {
-        //TODO implement timeout
-        String strParams = new String(params);
         String errorReport = "";
         if (semaphore.tryAcquire()) {
             try {
                 for (int i = 0; i < MAX_RETRANSMISSIONS; i++) {
-
                     String len = LEN + content.length + CR_LF;
 
                     Checksum checksum = new CRC32();
@@ -153,6 +277,13 @@ public class Comunicator {
 
                     String reqEnd = CRC + checksum.getValue() + CR_LF;
 
+                    appendToTxtLog(getCurrentTime() + "Request:\n" + POST + new String(params) + CR_LF + len + new String(content) + CR_LF + reqEnd);
+                    appendToHexLog(getCurrentTime() + "Request:\n" + POST + new String(params) + CR_LF + len + new String(content) + CR_LF + reqEnd);
+
+                    String tmpBuff = "tmp";
+                    receivedBuffer.clear();
+                    receivedBufferStr = "";
+
                     outputStream.write(POST.getBytes());
                     outputStream.write(params);
                     outputStream.write(CR_LF.getBytes());
@@ -161,49 +292,61 @@ public class Comunicator {
                     outputStream.write(CR_LF.getBytes());
                     outputStream.write(reqEnd.getBytes());
 
-                    if (strParams.equals(REBOOT_RESOURCE)) {
-                        receivedBuffer = "node restarting..." + nl;
-                        return receivedBuffer;
-                    }
-
                     long startMaster = System.currentTimeMillis();
                     long start = System.currentTimeMillis();
-                    String tmpBuff = "tmp";
-                    receivedBuffer = "";
-                    while (!receivedBuffer.contains(RESPONSE_END) && open) {
-                        if (!receivedBuffer.equals(tmpBuff)) {
+                    while (!receivedBufferStr.contains(RESPONSE_END) && open) {
+                        if (!receivedBufferStr.equals(tmpBuff)) {
                             start = System.currentTimeMillis();
                         }
                         long stop = System.currentTimeMillis();
                         if ((stop - start) > TIMEOUT || (stop - startMaster) > MASTER_TIMEOUT) {
-                            return receivedBuffer + nl + "Fatal Error: Response Timeout" + nl + nl;
+                            appendToTxtLog(getCurrentTime() + "Response:\n" + receivedBufferStr + nl + "Fatal Error: Response Timeout" + nl);
+                            receivedBuffer.flip();
+                            String hexStr = "";
+                            for (int j = 0; j < receivedBuffer.limit(); j++) {
+                                hexStr += Integer.toHexString(receivedBuffer.get(j)) + " ";
+                            }
+                            appendToHexLog(getCurrentTime() + "Response:\n" + hexStr + nl + "Fatal Error: Response Timeout" + nl);
+                            return receivedBufferStr + nl + "Fatal Error: Response Timeout" + nl + nl;
                         }
-                        tmpBuff = receivedBuffer;
+                        tmpBuff = receivedBufferStr;
                         try {
                             Thread.sleep(1);
                         } catch (InterruptedException ignore) {
                         }
                     }
-                    receivedBuffer = receivedBuffer.replace(RESPONSE_END, "");
-                    if (receivedBuffer.contains(JUNK_INPUT)
-                            || receivedBuffer.contains(CORRUPTED_DATA)) {
-                        receivedBuffer = receivedBuffer.replace(JUNK_INPUT, "");
-                        receivedBuffer = receivedBuffer.replace(CORRUPTED_DATA, "");
-                        String junkReport = receivedBuffer;
+                    if (receivedBufferStr.contains(JUNK_INPUT)
+                            || receivedBufferStr.contains(CORRUPTED_DATA)) {
+                        receivedBufferStr = receivedBufferStr.replace(JUNK_INPUT, "");
+                        receivedBufferStr = receivedBufferStr.replace(CORRUPTED_DATA, "");
+                        String junkReport = receivedBufferStr;
                         sendRecoveryRequest();
                         if (i == MAX_RETRANSMISSIONS - 1) {
-                            receivedBuffer = junkReport
+                            receivedBufferStr = junkReport
                                     + nl + "fatal error request did not go through, retransmissions: " + (i + 1) + nl;
                         } else {
-                            receivedBuffer = junkReport
+                            receivedBufferStr = junkReport
                                     + nl + "send with retransmissions: " + (i + 1) + nl;
                         }
-                    } else if (receivedBuffer.contains(ERROR)) {
-                        receivedBuffer = receivedBuffer.replace(ERROR, "");
-                        errorReport = receivedBuffer
+                    } else if (receivedBufferStr.contains(ERROR)) {
+                        if (receivedBufferStr.contains(NODES) && receivedBufferStr.contains(NODES_JUNK)) {
+                            String nodeRequest = new String(params);
+                            String xbitAddr = nodeRequest.substring(nodeRequest.indexOf('?') + 1, nodeRequest.indexOf('/'));
+                            sendNodeRecoveryRequest(xbitAddr);
+                        }
+                        receivedBufferStr = receivedBufferStr.replace(ERROR, "");
+                        errorReport = receivedBufferStr
                                 + nl + "send with retransmissions: " + (i + 1) + nl;
                     } else {
-                        return receivedBuffer + nl;
+                        appendToTxtLog(getCurrentTime() + "Response:\n" + receivedBufferStr + nl);
+                        receivedBuffer.flip();
+                        String hexStr = "";
+                        for (int j = 0; j < receivedBuffer.limit(); j++) {
+                            hexStr += Integer.toHexString(receivedBuffer.get(j)) + " ";
+                        }
+                        appendToHexLog(getCurrentTime() + "Response:\n" + hexStr + nl);
+                        receivedBufferStr = receivedBufferStr.replace(RESPONSE_END, "");
+                        return receivedBufferStr + nl;
                     }
                 }
             } catch (Exception ex) {
@@ -212,9 +355,16 @@ public class Comunicator {
                 semaphore.release();
             }
         } else {
-            receivedBuffer = "ERROR: Communication in progress\n";
+            receivedBufferStr = "ERROR: Communication in progress\n";
         }
-        return receivedBuffer + errorReport + "\n";
+        receivedBuffer.flip();
+        String hexStr = "";
+        for (int j = 0; j < receivedBuffer.limit(); j++) {
+            hexStr += Integer.toHexString(receivedBuffer.get(j)) + " ";
+        }
+        appendToHexLog(getCurrentTime() + "Response:\n" + hexStr + nl + errorReport + nl);
+        receivedBufferStr = receivedBufferStr.replace(RESPONSE_END, "");
+        return receivedBufferStr + errorReport + "\n";
     }
 
     private void sendRecoveryRequest() {
@@ -225,8 +375,8 @@ public class Comunicator {
                 outputStream.write(req.getBytes());
             }
 
-            receivedBuffer = "";
-            while (!receivedBuffer.contains(RESPONSE_END) && open) {
+            receivedBufferStr = "";
+            while (!receivedBufferStr.contains(RESPONSE_END) && open) {
                 try {
                     Thread.sleep(1);
                 } catch (InterruptedException ignore) {
@@ -236,7 +386,43 @@ public class Comunicator {
             logger.error(ex);
         }
     }
-    private SslServer sslServer = null;
+
+    private void sendNodeRecoveryRequest(String xbitAddr) {
+        try {
+            String recoveryResource = "radio/noderesetparser?" + xbitAddr;
+            byte[] params = recoveryResource.getBytes();
+            byte[] content = "1".getBytes();
+            String len = LEN + content.length + CR_LF;
+
+            Checksum checksum = new CRC32();
+            checksum.update(POST.getBytes(), 0, POST.getBytes().length);
+            checksum.update(params, 0, params.length);
+            checksum.update(CR_LF.getBytes(), 0, CR_LF.getBytes().length);
+            checksum.update(len.getBytes(), 0, len.getBytes().length);
+            checksum.update(content, 0, content.length);
+            checksum.update(CR_LF.getBytes(), 0, CR_LF.getBytes().length);
+
+            String reqEnd = CRC + checksum.getValue() + CR_LF;
+
+            outputStream.write(POST.getBytes());
+            outputStream.write(params);
+            outputStream.write(CR_LF.getBytes());
+            outputStream.write(len.getBytes());
+            outputStream.write(content);
+            outputStream.write(CR_LF.getBytes());
+            outputStream.write(reqEnd.getBytes());
+
+            receivedBufferStr = "";
+            while (!receivedBufferStr.contains(RESPONSE_END) && open) {
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException ignore) {
+                }
+            }
+        } catch (Exception ex) {
+            logger.error(ex);
+        }
+    }
 
     public String sslConnect(int port) {
         try {
@@ -254,6 +440,15 @@ public class Comunicator {
             return "\nSSL socket closed" + nl;
         } catch (Exception ex) {
             return "\nClosing SSL socket failed" + nl;
+        }
+    }
+
+    public String sslConnectionRestart() {
+        try {
+            sslServer.forceRestart();
+            return "\nSSL socket reseted" + nl;
+        } catch (Exception ex) {
+            return "\nRestarting SSL socket failed" + nl;
         }
     }
 
@@ -452,7 +647,8 @@ public class Comunicator {
                     avail = this.in.available();
                     if (avail > 0) {
                         len = this.in.read(buffer, 0, avail);
-                        receivedBuffer += new String(buffer, 0, len);
+                        receivedBufferStr += new String(buffer, 0, len);
+                        receivedBuffer.put(buffer, 0, len);
                     }
                     // wait a little
                     synchronized (lockInt) {
@@ -482,6 +678,24 @@ public class Comunicator {
             this.port = port;
         }
 
+        public void forceRestart() {
+            try {
+                open = false;
+
+                if (inputStream != null) {
+                    inputStream.close();
+                }
+                if (outputStream != null) {
+                    outputStream.close();
+                }
+                if (s != null) {
+                    s.close();
+                }
+            } catch (IOException e) {
+                logger.error(e);
+            }
+        }
+
         public void forceClose() {
             try {
                 open = false;
@@ -489,6 +703,9 @@ public class Comunicator {
                 runServer = false;
                 if (inputStream != null) {
                     inputStream.close();
+                }
+                if (outputStream != null) {
+                    outputStream.close();
                 }
                 if (s != null) {
                     s.close();
@@ -532,7 +749,8 @@ public class Comunicator {
                             try {
                                 while (runServer) {
                                     len = inputStream.read(buffer);
-                                    receivedBuffer += new String(buffer, 0, len);
+                                    receivedBufferStr += new String(buffer, 0, len);
+                                    receivedBuffer.put(buffer, 0, len);
                                 }
                             } catch (IOException e) {
                                 logger.debug("The SSL connection interrupted.");
@@ -542,9 +760,12 @@ public class Comunicator {
                             logger.debug("The SSL socket was closed unexpectedly or was forced to close.");
                         } finally {
                             open = false;
-                            sslServerRunning = false;                            
+                            sslServerRunning = false;
                             if (inputStream != null) {
                                 inputStream.close();
+                            }
+                            if (outputStream != null) {
+                                outputStream.close();
                             }
                             if (s != null) {
                                 s.close();
